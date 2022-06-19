@@ -27,7 +27,8 @@ def draw_energy_price_graph(draw, colours, hourlyPriceSeries):
     
     font = ImageFont.load('/usr/share/fonts/X11/misc/ter-u12b_unicode.pil')
     draw.text( (20,40), "min: {0} SEK".format(minHourlyPrice), font = font, fill=colours[0] )
-    draw.text( (130, 40), "max: {0} SEK".format(maxHourlyPrice), font = font, fill=colours[0] )
+    draw.text( (130, 40), "now: {0} SEK".format(hourlyPriceSeries[datetime.now().hour]), font = font, fill=colours[0] )
+    draw.text( (240, 40), "max: {0} SEK".format(maxHourlyPrice), font = font, fill=colours[0] )
 
 
 def generate_content(draw, data, colours):
