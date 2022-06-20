@@ -1,44 +1,44 @@
 import math
-from PIL import Image, ImageFont, ImageDraw, features
-from inky.auto import auto
-from datetime import datetime
 import locale
+from datetime import datetime
+from PIL import Image, ImageFont, ImageDraw
+from inky.auto import auto
 
-def draw_energy_price_graph(draw, colours, hourlyPriceSeries):
+def draw_energy_price_graph(draw, colours, day_hourly_prices):
 
     min_dim = (20, 60)
     max_dim = (380, 280)
     draw.rectangle([min_dim, max_dim], outline=colours[0])
 
-    maxHourlyPrice = max(hourlyPriceSeries)
-    minHourlyPrice = min(hourlyPriceSeries)
-    dY = max_dim[1] - min_dim[1] - 2
-    dX = max_dim[0] - min_dim[0]
-    barW = round(dX / len(hourlyPriceSeries))
+    hourly_price_max = max(day_hourly_prices)
+    hourly_price_min = min(day_hourly_prices)
+    dy = max_dim[1] - min_dim[1] - 2
+    dx = max_dim[0] - min_dim[0]
+    bar_width = round(dx / len(day_hourly_prices))
 
-    if (maxHourlyPrice > 1.0):
-        highest_full_sek = math.floor(maxHourlyPrice)
-        one_sek_step = round(((highest_full_sek * dY) / maxHourlyPrice) / highest_full_sek)
+    if hourly_price_max > 1.0:
+        highest_full_sek = math.floor(hourly_price_max)
+        one_sek_step = round(((highest_full_sek * dy) / hourly_price_max) / highest_full_sek)
 
         for y in range(highest_full_sek):
             for x in range(min_dim[0]+1, max_dim[0]):
-                if (x%2 == 0):
+                if x%2 == 0:
                     draw.point([x, max_dim[1]-(one_sek_step * (y+1))], fill=colours[0])
 
-    for index, hourlyPrice in enumerate(hourlyPriceSeries):
-        barLeft = (barW * index + min_dim[0]) + 2
-        barRight = (barW * (index +1 ) + min_dim[0]) - 2
-        barBottom = max_dim[1]
-        barTop = max_dim[1] - round(dY * (hourlyPrice / maxHourlyPrice)) 
-        if (datetime.now().hour == index):
-            draw.rectangle([barLeft-2, min_dim[1]+1, barRight+2, barBottom-1], fill=colours[1])
+    for hour, hourly_price in enumerate(day_hourly_prices):
+        bar_left = (bar_width * hour + min_dim[0]) + 2
+        bar_right = (bar_width * (hour +1 ) + min_dim[0]) - 2
+        bar_bottom = max_dim[1]
+        bar_top = max_dim[1] - round(dy * (hourly_price / hourly_price_max)) 
+        if datetime.now().hour == hour:
+            draw.rectangle([bar_left-2, min_dim[1]+1, bar_right+2, bar_bottom-1], fill=colours[1])
 
-        draw.rectangle([barLeft, barTop, barRight, barBottom], fill=colours[0])
-    
+        draw.rectangle([bar_left, bar_top, bar_right, bar_bottom], fill=colours[0])
+   
     font = ImageFont.load('/usr/share/fonts/X11/misc/ter-u12b_unicode.pil')
-    draw.text( (20,40), "min: {0} SEK".format(minHourlyPrice), font = font, fill=colours[0] )
-    draw.text( (130, 40), "now: {0} SEK".format(hourlyPriceSeries[datetime.now().hour]), font = font, fill=colours[0] )
-    draw.text( (240, 40), "max: {0} SEK (per kWh)".format(maxHourlyPrice), font = font, fill=colours[0] )
+    draw.text( (20,40), f"min: {hourly_price_min} SEK", font = font, fill=colours[0] )
+    draw.text( (130, 40), f"now: {day_hourly_prices[datetime.now().hour]} SEK", font = font, fill=colours[0] )
+    draw.text( (240, 40), f"max: {hourly_price_max} SEK (per kWh)", font = font, fill=colours[0] )
 
 
 def generate_content(draw, data, colours):
@@ -56,12 +56,11 @@ def generate_content(draw, data, colours):
     draw.text((400 - now_size[0], 300 - now_size[1]), now_text, font = font, fill=colours[1])
 
 def display(data):
-    
     inky_display = None
     try:
         inky_display = auto()
         print("INKY wHat display:", inky_display.colour)
-    except RuntimeError as e:
+    except RuntimeError:
         print("No INKY display found, using file output instead")
 
     if inky_display is None:
