@@ -50,8 +50,7 @@ def display(data):
     inky_display = None
     try:
         inky_display = auto()
-        print(inky_display.colour)
-        print(inky_display.resolution)
+        print("INKY wHat display:", inky_display.colour)
     except RuntimeError as e:
         print("No INKY display found, using file output instead")
 
