@@ -1,5 +1,5 @@
 # set base image (host OS)
-FROM python:3-slim-buster
+FROM python:3.9-slim-bullseye
 
 RUN apt-get update && apt-get install -y \
     gcc \
@@ -32,7 +32,6 @@ RUN fc-cache -fv
 RUN fc-list
 RUN gzip -d /usr/share/fonts/X11/misc/*.gz
 
-RUN "/usr/local/bin/pilfont.py" "/usr/share/fonts/X11/misc/ter-*_iso-8859-1.pcf"
 RUN "/usr/local/bin/pilfont.py" "/usr/share/fonts/X11/misc/ter-*_unicode.pcf"
 #RUN "/usr/local/bin/pilfont.py" "/usr/share/fonts/misc/*x?.pcf"
 
