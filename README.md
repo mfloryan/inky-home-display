@@ -20,7 +20,7 @@ https://github.com/pimoroni/inky/blob/master/examples/what/quotes-what.py
 
 `docker build --pull --tag inky-display .`
 
-`docker run --rm -v (pwd)/out:/code/img/ inky-display`
+`docker run --rm -v (pwd)/out:/code/img/ -v (pwd)/out/cache:/code/cache inky-display`
 
 ## DEPLOY
 

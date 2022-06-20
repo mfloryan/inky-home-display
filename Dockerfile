@@ -48,6 +48,8 @@ COPY src/ .
 
 RUN mkdir img/
 VOLUME [ "/code/img" ]
+RUN mkdir cache
+VOLUME [ "/code/cache" ]
 
 # command to run on container start
 CMD [ "python", "./update_display.py" ]
