@@ -34,7 +34,7 @@ def draw_energy_price_graph(draw, colours, hourlyPriceSeries):
 def generate_content(draw, data, colours):
     locale.setlocale(locale.LC_ALL, "pl_PL.utf8")
 
-    font22 = ImageFont.load("/usr/share/fonts/X11/misc/ter-u22b_unicode.pil")
+    font22 = ImageFont.truetype("/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf", 22)
     draw.text((10, 10), datetime.now().strftime('%A %d %B %Y'), font = font22, fill=colours[0])
 
     draw_energy_price_graph(draw, colours, data['energy_prices'])
