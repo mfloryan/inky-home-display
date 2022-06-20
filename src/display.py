@@ -1,3 +1,4 @@
+import math
 from PIL import Image, ImageFont, ImageDraw, features
 from inky.auto import auto
 from datetime import datetime
@@ -5,30 +6,39 @@ import locale
 
 def draw_energy_price_graph(draw, colours, hourlyPriceSeries):
 
-    minDim = (20, 60)
-    maxDim = (380, 280)
-    draw.rectangle([minDim, maxDim], outline=colours[0])
+    min_dim = (20, 60)
+    max_dim = (380, 280)
+    draw.rectangle([min_dim, max_dim], outline=colours[0])
 
     maxHourlyPrice = max(hourlyPriceSeries)
     minHourlyPrice = min(hourlyPriceSeries)
-    dY = maxDim[1] - minDim[1] - 2
-    dX = maxDim[0] - minDim[0]
+    dY = max_dim[1] - min_dim[1] - 2
+    dX = max_dim[0] - min_dim[0]
     barW = round(dX / len(hourlyPriceSeries))
 
+    if (maxHourlyPrice > 1.0):
+        highest_full_sek = math.floor(maxHourlyPrice)
+        one_sek_step = round(((highest_full_sek * dY) / maxHourlyPrice) / highest_full_sek)
+
+        for y in range(highest_full_sek):
+            for x in range(min_dim[0]+1, max_dim[0]):
+                if (x%2 == 0):
+                    draw.point([x, max_dim[1]-(one_sek_step * (y+1))], fill=colours[0])
+
     for index, hourlyPrice in enumerate(hourlyPriceSeries):
-        barLeft = (barW * index + minDim[0]) + 2
-        barRight = (barW * (index +1 ) + minDim[0]) - 2
-        barBottom = maxDim[1]
-        barTop = maxDim[1] - round(dY * (hourlyPrice / maxHourlyPrice)) 
+        barLeft = (barW * index + min_dim[0]) + 2
+        barRight = (barW * (index +1 ) + min_dim[0]) - 2
+        barBottom = max_dim[1]
+        barTop = max_dim[1] - round(dY * (hourlyPrice / maxHourlyPrice)) 
         if (datetime.now().hour == index):
-            draw.rectangle([barLeft-2, minDim[1]+1, barRight+2, barBottom-1], fill=colours[1])
+            draw.rectangle([barLeft-2, min_dim[1]+1, barRight+2, barBottom-1], fill=colours[1])
 
         draw.rectangle([barLeft, barTop, barRight, barBottom], fill=colours[0])
     
     font = ImageFont.load('/usr/share/fonts/X11/misc/ter-u12b_unicode.pil')
     draw.text( (20,40), "min: {0} SEK".format(minHourlyPrice), font = font, fill=colours[0] )
     draw.text( (130, 40), "now: {0} SEK".format(hourlyPriceSeries[datetime.now().hour]), font = font, fill=colours[0] )
-    draw.text( (240, 40), "max: {0} SEK".format(maxHourlyPrice), font = font, fill=colours[0] )
+    draw.text( (240, 40), "max: {0} SEK (per kWh)".format(maxHourlyPrice), font = font, fill=colours[0] )
 
 
 def generate_content(draw, data, colours):
