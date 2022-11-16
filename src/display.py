@@ -25,11 +25,12 @@ def draw_energy_price_graph(draw, colours, day_hourly_prices):
                 if x%2 == 0:
                     draw.point([x, max_dim[1]-(one_sek_step * (y+1))], fill=colours[0])
 
+    x_axis_max = max(hourly_price_max, 1) # scale up to max value or 1 for small daily values
     for hour, hourly_price in enumerate(day_hourly_prices):
         bar_left = (bar_width * hour + min_dim[0]) + 2
         bar_right = (bar_width * (hour +1 ) + min_dim[0]) - 2
         bar_bottom = max_dim[1]
-        bar_top = max_dim[1] - round(dy * (hourly_price / hourly_price_max)) 
+        bar_top = max_dim[1] - round(dy * (hourly_price / x_axis_max)) 
         if datetime.now().hour == hour:
             draw.rectangle([bar_left-2, min_dim[1]+1, bar_right+2, bar_bottom-1], fill=colours[1])
 
