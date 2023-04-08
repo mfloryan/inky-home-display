@@ -2,3 +2,4 @@
 out/
 *-token
 __pycache__/
+env/
