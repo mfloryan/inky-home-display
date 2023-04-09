@@ -6,7 +6,6 @@ from inky.auto import auto
 
 
 def draw_energy_price_graph(draw, colours, day_hourly_prices):
-
     min_dim = (6, 60)
     max_dim = (270, 284)
     draw.rectangle([min_dim, max_dim], outline=colours[0])
@@ -23,10 +22,10 @@ def draw_energy_price_graph(draw, colours, day_hourly_prices):
             ((highest_full_sek * dy) / hourly_price_max) / highest_full_sek)
 
         for y in range(highest_full_sek):
-            for x in range(min_dim[0]+1, max_dim[0]):
+            for x in range(min_dim[0] + 1, max_dim[0]):
                 if x % 2 == 0:
                     draw.point(
-                        [x, max_dim[1]-(one_sek_step * (y+1))], fill=colours[0])
+                        [x, max_dim[1] - (one_sek_step * (y + 1))], fill=colours[0])
 
     # scale up to max value or 1 for small daily values
     x_axis_max = max(hourly_price_max, 1)
@@ -36,34 +35,40 @@ def draw_energy_price_graph(draw, colours, day_hourly_prices):
         bar_bottom = max_dim[1]
         bar_top = max_dim[1] - round(dy * (hourly_price / x_axis_max))
         if datetime.now().hour == hour:
-            draw.rectangle([bar_left-2, min_dim[1]+1,
-                           bar_right+2, bar_bottom-1], fill=colours[1])
+            draw.rectangle([bar_left - 2, min_dim[1] + 1,
+                            bar_right + 2, bar_bottom - 1], fill=colours[1])
 
         draw.rectangle([bar_left, bar_top, bar_right,
-                       bar_bottom], fill=colours[0])
+                        bar_bottom], fill=colours[0])
 
     font_bold = ImageFont.load(
         '/usr/share/fonts/X11/misc/ter-u16b_unicode.pil')
     font = ImageFont.load('/usr/share/fonts/X11/misc/ter-u12n_unicode.pil')
 
     price_range_text = f"{round(hourly_price_min, 2)} -- {round(hourly_price_max, 2)} SEK"
-    now_price_text = f"now: {round(day_hourly_prices[datetime.now().hour], 2)} SEK"
-    draw.line(
-        (10, 48, 10 + draw.textlength(now_price_text, font=font_bold), 48),
-        fill=colours[1], width=4)
+    draw.text((10, 28), price_range_text, font=font, fill=colours[0])
 
-    draw.text((10, 26), price_range_text, font=font,
-              fill=colours[0], anchor="ms")
-    draw.text((10, 38), now_price_text, font=font_bold, fill=colours[0])
+    now_price_baseline = 42
+    now_price_left = 10
+    now_price_text = f"now: {round(day_hourly_prices[datetime.now().hour], 2)} SEK"
+    draw.rectangle(
+        [(now_price_left - 2, now_price_baseline-1),
+         (now_price_left - 2 + draw.textlength(now_price_text, font=font_bold) + 2, now_price_baseline + 13)],
+        outline=colours[1], width=1)
+    draw.text((now_price_left, now_price_baseline), now_price_text, font=font_bold, fill=colours[0])
 
 
 def draw_weather(draw, colours, data):
     fontS = ImageFont.load('/usr/share/fonts/X11/misc/ter-u12n_unicode.pil')
     fontM = ImageFont.load('/usr/share/fonts/X11/misc/ter-u14n_unicode.pil')
     fontL = ImageFont.load('/usr/share/fonts/X11/misc/ter-u22b_unicode.pil')
-    draw.text((300, 10), "pogoda", font=fontM, fill=colours[0])
+    draw.text((300, 8), "pogoda", font=fontM, fill=colours[1])
     draw.text((300, 24), data['name'], font=fontS, fill=colours[0])
-    draw.text((304, 38), f"{round(data['now']['temp'], 2)}°C", font = fontL, fill=colours[0])
+    draw.ellipse([(300, 36), (310, 46)], fill=colours[1])
+    draw.text((314, 36), f"{data['sunrise'].strftime('%H:%m')}-{data['sunset'].strftime('%H:%m')}",
+              font=fontS,
+              fill=colours[0])
+    draw.text((304, 50), f"{round(data['now']['temp'], 2)}°C", font=fontL, fill=colours[0])
 
 
 def generate_content(draw, data, colours):
