@@ -1,0 +1,44 @@
+from datetime import datetime
+import logging
+import os
+
+import requests
+import json
+
+def load_token():
+    try:
+        file = open(
+            os.path.join(os.path.dirname(__file__), 'openweather-api-token'),
+            'r',
+            encoding="utf-8")
+    except FileNotFoundError as ex:
+        logging.getLogger(__name__).error("Token file `openweather-api-token` not found")
+        raise RuntimeError("Unable to load Open Weather token") from ex
+    else:
+        with file:
+            return file.read()
+
+
+def get_weather():
+    payload = {
+        'lat': '59.4308',
+        'lon': '18.0637',
+        'units': 'metric',
+        'appid': load_token()}
+
+    r = requests.get('https://api.openweathermap.org/data/2.5/weather', params=payload)
+    current_weather = r.json()
+    weather = {
+        'name': current_weather['name'],
+        'sunrise': datetime.fromtimestamp(current_weather['sys']['sunrise']),
+        'sunset': datetime.fromtimestamp(current_weather['sys']['sunset']),
+        'now': {
+            'temp': current_weather['main']['temp'],
+        }
+    }
+
+    # r = requests.get('https://api.openweathermap.org/data/2.5/forecast', params=payload)
+    # payload['cnt'] = 8  # Get next 24h
+    # print(r.url)
+    # print(json.dumps(r.json(), indent=4))
+    return weather

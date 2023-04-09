@@ -57,6 +57,14 @@ def draw_energy_price_graph(draw, colours, day_hourly_prices):
     draw.text((10, 38), now_price_text, font=font_bold, fill=colours[0])
 
 
+def draw_weather(draw, colours, data):
+    fontS = ImageFont.load('/usr/share/fonts/X11/misc/ter-u14n_unicode.pil')
+    fontL = ImageFont.load('/usr/share/fonts/X11/misc/ter-u22b_unicode.pil')
+    draw.text((310, 10), "pogoda", font=fontS, fill=colours[0])
+    draw.text((310, 24), data['name'], font=fontS, fill=colours[0])
+    draw.text((320, 38), f"{round(data['now']['temp'], 2)}°C", font = fontL, fill=colours[0])
+
+
 def generate_content(draw, data, colours):
     locale.setlocale(locale.LC_ALL, "pl_PL.utf8")
 
@@ -64,7 +72,11 @@ def generate_content(draw, data, colours):
     draw.text((4, 0), datetime.now().strftime(
         '%A %d %B %Y'), font=font22, fill=colours[0])
 
-    draw_energy_price_graph(draw, colours, data['energy_prices'])
+    if data['energy_prices']:
+        draw_energy_price_graph(draw, colours, data['energy_prices'])
+
+    if data['weather']:
+        draw_weather(draw, colours, data['weather'])
 
     locale.setlocale(locale.LC_ALL, "en_GB.utf8")
     font = ImageFont.load('/usr/share/fonts/X11/misc/ter-u12n_unicode.pil')
