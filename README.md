@@ -10,7 +10,7 @@ Python script generating an INKY screen display
 
 <https://www.trafiklab.se/api/sl-realtidsinformation-4>
 
-## Harwdare
+## Hardware
 
 ## Some inspiration
 
@@ -24,4 +24,4 @@ Python script generating an INKY screen display
 
 ## DEPLOY
 
-``
+`rsync -arv --exclude '__pycache__/' src/ jagoda.mm.local:inky/`
