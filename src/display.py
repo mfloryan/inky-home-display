@@ -8,7 +8,7 @@ from inky.auto import auto
 def draw_energy_price_graph(draw, colours, day_hourly_prices):
 
     min_dim = (6, 60)
-    max_dim = (390, 284)
+    max_dim = (270, 284)
     draw.rectangle([min_dim, max_dim], outline=colours[0])
 
     hourly_price_max = max(day_hourly_prices)
@@ -58,11 +58,12 @@ def draw_energy_price_graph(draw, colours, day_hourly_prices):
 
 
 def draw_weather(draw, colours, data):
-    fontS = ImageFont.load('/usr/share/fonts/X11/misc/ter-u14n_unicode.pil')
+    fontS = ImageFont.load('/usr/share/fonts/X11/misc/ter-u12n_unicode.pil')
+    fontM = ImageFont.load('/usr/share/fonts/X11/misc/ter-u14n_unicode.pil')
     fontL = ImageFont.load('/usr/share/fonts/X11/misc/ter-u22b_unicode.pil')
-    draw.text((310, 10), "pogoda", font=fontS, fill=colours[0])
-    draw.text((310, 24), data['name'], font=fontS, fill=colours[0])
-    draw.text((320, 38), f"{round(data['now']['temp'], 2)}°C", font = fontL, fill=colours[0])
+    draw.text((300, 10), "pogoda", font=fontM, fill=colours[0])
+    draw.text((300, 24), data['name'], font=fontS, fill=colours[0])
+    draw.text((304, 38), f"{round(data['now']['temp'], 2)}°C", font = fontL, fill=colours[0])
 
 
 def generate_content(draw, data, colours):
