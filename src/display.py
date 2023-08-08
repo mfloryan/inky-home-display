@@ -59,16 +59,35 @@ def draw_energy_price_graph(draw, colours, day_hourly_prices):
 
 
 def draw_weather(draw, colours, data):
+
     fontS = ImageFont.load('/usr/share/fonts/X11/misc/ter-u12n_unicode.pil')
     fontM = ImageFont.load('/usr/share/fonts/X11/misc/ter-u14n_unicode.pil')
     fontL = ImageFont.load('/usr/share/fonts/X11/misc/ter-u22b_unicode.pil')
+    fontPL = ImageFont.truetype("/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf", 12)
+    temperature_right = 390
+
+    def draw_single_forecast(forecast, y):
+        draw.text((280, y), forecast['time'].strftime('%H:%M'), font=fontM, fill=colours[0])
+        temp_text = f"{round(forecast['temp'])}°C"
+        draw.text((temperature_right - draw.textlength(temp_text, font=fontL), y-6), temp_text, font=fontL, fill=colours[0])
+        y += 12
+        draw.text((280, y), forecast['weather'], font=fontPL, fill=colours[0])
+        y += 26
+        return y
+
     draw.text((300, 8), "pogoda", font=fontM, fill=colours[1])
-    draw.text((300, 24), data['name'], font=fontS, fill=colours[0])
+    draw.text((300, 20), data['name'], font=fontPL, fill=colours[0])
     draw.ellipse([(300, 36), (310, 46)], fill=colours[1])
-    draw.text((314, 36), f"{data['sunrise'].strftime('%H:%m')}-{data['sunset'].strftime('%H:%m')}",
+    draw.text((314, 36), f"{data['sunrise'].strftime('%H:%M')}-{data['sunset'].strftime('%H:%M')}",
               font=fontS,
               fill=colours[0])
-    draw.text((304, 50), f"{round(data['now']['temp'], 2)}°C", font=fontL, fill=colours[0])
+    temp_text = f"{round(data['now']['temp'], 1)}°C"
+    draw.text((temperature_right - draw.textlength(temp_text, font=fontL), 50), temp_text, font=fontL, fill=colours[0])
+    draw.text((280, 55), "teraz:", font=fontPL, fill=colours[1])
+
+    forecast_y = 86
+    for forecast in data['forecast'][:4]:
+        forecast_y = draw_single_forecast(forecast, forecast_y)
 
 
 def generate_content(draw, data, colours):

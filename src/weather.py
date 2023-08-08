@@ -3,7 +3,7 @@ import logging
 import os
 
 import requests
-import json
+
 
 def load_token():
     try:
@@ -20,10 +20,18 @@ def load_token():
 
 
 def get_weather():
+    def parse_forecast(item):
+        return {
+            'time': datetime.fromtimestamp(item['dt']),
+            'temp': item['main']['temp'],
+            'weather': item['weather'][0]['description']
+        }
+
     payload = {
         'lat': '59.4308',
         'lon': '18.0637',
         'units': 'metric',
+        'lang': 'pl',
         'appid': load_token()}
 
     r = requests.get('https://api.openweathermap.org/data/2.5/weather', params=payload)
@@ -37,8 +45,8 @@ def get_weather():
         }
     }
 
-    # r = requests.get('https://api.openweathermap.org/data/2.5/forecast', params=payload)
-    # payload['cnt'] = 8  # Get next 24h
-    # print(r.url)
-    # print(json.dumps(r.json(), indent=4))
+    payload['cnt'] = 8  # Get next 24h
+    r = requests.get('https://api.openweathermap.org/data/2.5/forecast', params=payload)
+    forecast = r.json()
+    weather['forecast'] = list(map(parse_forecast, forecast['list']))
     return weather
