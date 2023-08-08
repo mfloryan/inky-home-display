@@ -33,7 +33,8 @@ def draw_energy_price_graph(draw, colours, day_hourly_prices):
         bar_left = (bar_width * hour + min_dim[0]) + 2
         bar_right = (bar_width * (hour + 1) + min_dim[0]) - 2
         bar_bottom = max_dim[1]
-        bar_top = max_dim[1] - round(dy * (hourly_price / x_axis_max))
+        # TODO: Handle negative prices better instead of ignoring them in the display.
+        bar_top = max_dim[1] - round(dy * (max(hourly_price, 0) / x_axis_max))
         if datetime.now().hour == hour:
             draw.rectangle([bar_left - 2, min_dim[1] + 1,
                             bar_right + 2, bar_bottom - 1], fill=colours[1])
