@@ -15,7 +15,7 @@ def test_fonts():
     x = 0
     for i in [12, 14, 16, 18]:
         font = ImageFont.load(f"/usr/share/fonts/X11/misc/ter-u{i}n_iso-8859-1.pil")
-        draw.text((10, x), "The quick brown fox jumps over the lazy dog", font=font)
+        draw.text((10, x), "The quick brown fox jumps over the lazy dog " + i, font=font)
         x += i
 
     font32b = ImageFont.load("/usr/share/fonts/X11/misc/ter-u32b_iso-8859-1.pil")
