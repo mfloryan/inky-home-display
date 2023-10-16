@@ -107,8 +107,8 @@ def generate_content(draw, data, colours):
     locale.setlocale(locale.LC_ALL, "en_GB.utf8")
     font = ImageFont.load('/usr/share/fonts/X11/misc/ter-u12n_unicode.pil')
     now_text = "Updated: " + datetime.now().strftime('%c')
-    now_size = draw.textsize(now_text, font=font)
-    draw.text((400 - now_size[0], 300 - now_size[1]),
+    now_size = draw.textbbox((0, 0), now_text, font=font)
+    draw.text((400 - now_size[2], 300 - now_size[3]),
               now_text, font=font, fill=colours[1])
 
 
