@@ -47,7 +47,7 @@ COPY src/ .
 
 RUN mkdir img/
 VOLUME [ "/code/img" ]
-RUN mkdir cache
+RUN mkdir -p cache
 VOLUME [ "/code/cache" ]
 
 # command to run on container start
