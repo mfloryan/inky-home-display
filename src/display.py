@@ -62,7 +62,7 @@ def draw_energy_price_graph(draw, colours, day_hourly_prices):
 def draw_weather(draw, colours, data):
 
     fontS = ImageFont.load('/usr/share/fonts/X11/misc/ter-u12n_unicode.pil')
-    fontM = ImageFont.load('/usr/share/fonts/X11/misc/ter-u14n_unicode.pil')
+    fontM = ImageFont.load('/usr/share/fonts/X11/misc/ter-u14b_unicode.pil')
     fontL = ImageFont.load('/usr/share/fonts/X11/misc/ter-u22b_unicode.pil')
     fontPL = ImageFont.truetype("/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf", 12)
     temperature_right = 390
@@ -78,8 +78,8 @@ def draw_weather(draw, colours, data):
 
     draw.text((300, 8), "pogoda", font=fontM, fill=colours[1])
     draw.text((300, 20), data['name'], font=fontPL, fill=colours[0])
-    draw.ellipse([(300, 36), (310, 46)], fill=colours[1])
-    draw.text((314, 36), f"{data['sunrise'].strftime('%H:%M')}-{data['sunset'].strftime('%H:%M')}",
+    draw.ellipse([(288, 36), (298, 46)], fill=colours[1])
+    draw.text((300, 36), f"{data['sunrise'].strftime('%H:%M')}-{data['sunset'].strftime('%H:%M')}",
               font=fontS,
               fill=colours[0])
     temp_text = f"{round(data['now']['temp'], 1)}°C"
