@@ -9,11 +9,9 @@ from weather import get_weather
 
 
 def main():
-    data = {}
-    data['energy_prices'] = tibber_energy_prices()
+    data = {'energy_prices': tibber_energy_prices(), 'weather': get_weather()}
     # transport = getDeparturesBasedOnTimeOfDay()
     # print(transport)
-    data['weather'] = get_weather()
     display(data)
 
 
