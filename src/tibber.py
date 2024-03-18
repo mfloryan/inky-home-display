@@ -52,10 +52,8 @@ def load_day_stats_from_tibber():
     consumption = {'consumption': 0, 'cost': 0}
     for n in data['consumption']['nodes']:
         if today(datetime.fromisoformat(n['from'])):
-            stats['consumption'] += n['consumption']
-            stats['cost'] += n['cost']
-
-    print(stats)
+            if n['consumption']: stats['consumption'] += n['consumption']
+            if n['cost']: stats['cost'] += n['cost']
 
     return stats
 
