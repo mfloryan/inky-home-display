@@ -53,14 +53,13 @@ def draw_energy_price_graph(draw, colours, day_hourly_prices):
     now_price_left = 10
     now_price_text = f"now: {round(day_hourly_prices[datetime.now().hour], 2)} SEK"
     draw.rectangle(
-        [(now_price_left - 2, now_price_baseline-1),
+        [(now_price_left - 2, now_price_baseline - 1),
          (now_price_left - 2 + draw.textlength(now_price_text, font=font_bold) + 2, now_price_baseline + 13)],
         outline=colours[1], width=1)
     draw.text((now_price_left, now_price_baseline), now_price_text, font=font_bold, fill=colours[0])
 
 
 def draw_weather(draw, colours, data):
-
     font_sun = ImageFont.load('/usr/share/fonts/X11/misc/ter-u12n_unicode.pil')
     font_header = ImageFont.load('/usr/share/fonts/X11/misc/ter-u14b_unicode.pil')
     font_temp = ImageFont.load('/usr/share/fonts/X11/misc/ter-u22b_unicode.pil')
@@ -70,7 +69,8 @@ def draw_weather(draw, colours, data):
     def draw_single_forecast(forecast, y):
         draw.text((280, y), forecast['time'].strftime('%H:%M'), font=font_header, fill=colours[0])
         temp_text = f"{round(forecast['temp'])}°C"
-        draw.text((temperature_right - draw.textlength(temp_text, font=font_temp), y-6), temp_text, font=font_temp, fill=colours[0])
+        draw.text((temperature_right - draw.textlength(temp_text, font=font_temp), y - 6), temp_text, font=font_temp,
+                  fill=colours[0])
         y += 12
         draw.text((280, y), forecast['weather'], font=font_label, fill=colours[0])
         y += 26
@@ -83,7 +83,8 @@ def draw_weather(draw, colours, data):
               font=font_sun,
               fill=colours[0])
     temp_text = f"{round(data['now']['temp'], 1)}°C"
-    draw.text((temperature_right - draw.textlength(temp_text, font=font_temp), 50), temp_text, font=font_temp, fill=colours[0])
+    draw.text((temperature_right - draw.textlength(temp_text, font=font_temp), 50), temp_text, font=font_temp,
+              fill=colours[0])
     draw.text((280, 55), "teraz:", font=font_label, fill=colours[1])
 
     forecast_y = 86

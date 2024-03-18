@@ -4,6 +4,7 @@ from datetime import datetime
 import requests
 from cache import cache
 
+
 def load_token():
     try:
         file = open(
