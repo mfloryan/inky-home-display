@@ -18,12 +18,22 @@ def load_token():
         with file:
             return file.read()
 
+
 def load_prices_from_tibber():
-    query = {
-        'query': '{ viewer { homes { currentSubscription { priceInfo{today {total startsAt}}}}}}'}
-    headers = {'authorization': 'Bearer ' + load_token()}
+    query = '{ viewer { homes { currentSubscription { priceInfo{today {total startsAt}}}}}}'
+
+    response_json = load_data_from_tibber(load_token(), query)
+    hourly = response_json['data']['viewer']['homes'][0]['currentSubscription']['priceInfo']['today']
+    return list(map(lambda _: _['total'], hourly))
+def load_data_from_tibber(token, query):
     response = requests.post(
-        'https://api.tibber.com/v1-beta/gql', json=query, headers=headers)
+        'https://api.tibber.com/v1-beta/gql',
+        headers={
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        },
+        json={'query': query})
+
     if response.status_code != 200:
         raise RuntimeError(
             f"Tiber responded with response code: {response.status_code}")
@@ -33,8 +43,8 @@ def load_prices_from_tibber():
         raise RuntimeError(
             f"Tibber returned errors: {response_json['errors']}")
 
-    hourly = response_json['data']['viewer']['homes'][0]['currentSubscription']['priceInfo']['today']
-    return list(map(lambda _: _['total'], hourly))
+    return response_json
+
 
 def tibber_energy_prices():
-    return cache(f"tibber-{datetime.now().strftime('%Y%m%d')}", load_prices_from_tibber)
+    return cache(f"tibber-prices-{datetime.now().strftime('%Y%m%d')}", load_prices_from_tibber)
