@@ -25,6 +25,41 @@ def load_prices_from_tibber():
     response_json = load_data_from_tibber(load_token(), query)
     hourly = response_json['data']['viewer']['homes'][0]['currentSubscription']['priceInfo']['today']
     return list(map(lambda _: _['total'], hourly))
+
+
+def load_day_stats_from_tibber():
+    query = \
+        ("{ viewer { homes { "
+         "consumption(resolution: HOURLY, last: 24) { nodes { from to cost consumption }}"
+         "production(resolution: HOURLY, last: 24) { nodes { from to profit production }}"
+         "}}}")
+
+    data = load_data_from_tibber(load_token(), query)['data']['viewer']['homes'][0]
+
+    now = datetime.now()
+    today = lambda date: date.day == now.day
+
+    stats = {
+        'production': 0, 'profit': 0,
+        'consumption': 0, 'cost': 0
+    }
+
+    for n in data['production']['nodes']:
+        if today(datetime.fromisoformat(n['from'])):
+            if n['production']: stats['production'] += n['production']
+            if n['profit']: stats['profit'] += n['profit']
+
+    consumption = {'consumption': 0, 'cost': 0}
+    for n in data['consumption']['nodes']:
+        if today(datetime.fromisoformat(n['from'])):
+            stats['consumption'] += n['consumption']
+            stats['cost'] += n['cost']
+
+    print(stats)
+
+    return stats
+
+
 def load_data_from_tibber(token, query):
     response = requests.post(
         'https://api.tibber.com/v1-beta/gql',
@@ -48,3 +83,7 @@ def load_data_from_tibber(token, query):
 
 def tibber_energy_prices():
     return cache(f"tibber-prices-{datetime.now().strftime('%Y%m%d')}", load_prices_from_tibber)
+
+
+def tibber_energy_stats():
+    return cache(f"tibber-stats-{datetime.now().strftime('%Y%m%d-%H')}", load_day_stats_from_tibber)
