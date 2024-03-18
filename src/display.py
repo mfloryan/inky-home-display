@@ -6,14 +6,14 @@ from inky.auto import auto
 
 
 def draw_energy_price_graph(draw, colours, day_hourly_prices):
-    min_dim = (6, 60)
-    max_dim = (270, 284)
-    draw.rectangle([min_dim, max_dim], outline=colours[0])
+    min_dim = {'x': 6, 'y': 60}
+    max_dim = {'x': 270, 'y': 284}
+    draw.rectangle([min_dim['x'], min_dim['y'], max_dim['x'], max_dim['y']], outline=colours[0])
 
     hourly_price_max = max(day_hourly_prices)
     hourly_price_min = min(day_hourly_prices)
-    dy = max_dim[1] - min_dim[1] - 2
-    dx = max_dim[0] - min_dim[0]
+    dy = max_dim['y'] - min_dim['y'] - 2
+    dx = max_dim['x'] - min_dim['x']
     bar_width = round(dx / len(day_hourly_prices))
 
     if hourly_price_max > 1.0:
@@ -22,21 +22,21 @@ def draw_energy_price_graph(draw, colours, day_hourly_prices):
             ((highest_full_sek * dy) / hourly_price_max) / highest_full_sek)
 
         for y in range(highest_full_sek):
-            for x in range(min_dim[0] + 1, max_dim[0]):
+            for x in range(min_dim['x'] + 1, max_dim['x']):
                 if x % 2 == 0:
                     draw.point(
-                        [x, max_dim[1] - (one_sek_step * (y + 1))], fill=colours[0])
+                        [x, max_dim['y'] - (one_sek_step * (y + 1))], fill=colours[0])
 
     # scale up to max value or 1 for small daily values
     x_axis_max = max(hourly_price_max, 1)
     for hour, hourly_price in enumerate(day_hourly_prices):
-        bar_left = (bar_width * hour + min_dim[0]) + 2
-        bar_right = (bar_width * (hour + 1) + min_dim[0]) - 2
-        bar_bottom = max_dim[1]
+        bar_left = (bar_width * hour + min_dim['x']) + 2
+        bar_right = (bar_width * (hour + 1) + min_dim['x']) - 2
+        bar_bottom = max_dim['y']
         # TODO: Handle negative prices better instead of ignoring them in the display.
-        bar_top = max_dim[1] - round(dy * (max(hourly_price, 0) / x_axis_max))
+        bar_top = max_dim['y'] - round(dy * (max(hourly_price, 0) / x_axis_max))
         if datetime.now().hour == hour:
-            draw.rectangle([bar_left - 2, min_dim[1] + 1,
+            draw.rectangle([bar_left - 2, min_dim['y'] + 1,
                             bar_right + 2, bar_bottom - 1], fill=colours[1])
 
         draw.rectangle([bar_left, bar_top, bar_right,
