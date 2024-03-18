@@ -59,6 +59,14 @@ def draw_energy_price_graph(draw, colours, day_hourly_prices):
     draw.text((now_price_left, now_price_baseline), now_price_text, font=font_bold, fill=colours[0])
 
 
+def draw_energy_stats(draw, colours, data):
+    font = ImageFont.truetype('/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf', 11)
+    production_text = f"Sold: {round(data['production'], 2)} kWh - {round(data['profit'], 2)} SEK"
+    consumption_text = f"Used: {round(data['consumption'], 2)} kWh - {round(data['cost'], 2)} SEK"
+
+    draw.text((270, 28), production_text, font=font, fill=colours[0], anchor="ra")
+    draw.text((270, 42), consumption_text, font=font, fill=colours[0], anchor="ra")
+
 def draw_weather(draw, colours, data):
     font_sun = ImageFont.load('/usr/share/fonts/X11/misc/ter-u12n_unicode.pil')
     font_header = ImageFont.load('/usr/share/fonts/X11/misc/ter-u14b_unicode.pil')
@@ -101,6 +109,9 @@ def generate_content(draw, data, colours):
 
     if data['energy_prices']:
         draw_energy_price_graph(draw, colours, data['energy_prices'])
+
+    if data['energy_stats']:
+        draw_energy_stats(draw, colours, data['energy_stats'])
 
     if data['weather']:
         draw_weather(draw, colours, data['weather'])
