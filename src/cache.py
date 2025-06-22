@@ -1,5 +1,4 @@
 import os
-import io
 import json
 
 def cache(cache_key, operation):
