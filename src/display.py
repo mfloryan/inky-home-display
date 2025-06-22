@@ -61,8 +61,8 @@ def draw_energy_price_graph(draw, colours, day_hourly_prices):
 
 def draw_energy_stats(draw, colours, data):
     font = ImageFont.truetype('/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf', 11)
-    production_text = f"do sieci {round(data['production'], 2)} kWh +{round(data['profit'], 2)} SEK"
-    consumption_text = f"z sieci {round(data['consumption'], 2)} kWh -{round(data['cost'], 2)} SEK"
+    production_text = f"do sieci {round(data['production'], 2)} kWh {data['profit']:+.2f} SEK"
+    consumption_text = f"z sieci {round(data['consumption'], 2)} kWh {data['cost']:+.2f} SEK"
 
     draw.text((270, 28), production_text, font=font, fill=colours[0], anchor="ra")
     draw.text((270, 42), consumption_text, font=font, fill=colours[0], anchor="ra")
