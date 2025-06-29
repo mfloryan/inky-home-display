@@ -28,19 +28,23 @@ def draw_energy_price_graph(draw, colours, day_hourly_prices):
                         [x, max_dim['y'] - (one_sek_step * (y + 1))], fill=colours[0])
 
     # scale up to max value or 1 for small daily values
-    x_axis_max = max(hourly_price_max, 1)
+    max_abs_price = max(abs(hourly_price_max), abs(hourly_price_min), 1.0)
     for hour, hourly_price in enumerate(day_hourly_prices):
         bar_left = (bar_width * hour + min_dim['x']) + 2
         bar_right = (bar_width * (hour + 1) + min_dim['x']) - 2
-        bar_bottom = max_dim['y']
-        # TODO: Handle negative prices better instead of ignoring them in the display.
-        bar_top = max_dim['y'] - round(dy * (max(hourly_price, 0) / x_axis_max))
+
+        if hourly_price >= 0:
+            bar_top = max_dim['y'] - round(dy * (hourly_price / max_abs_price))
+            bar_bottom = max_dim['y']
+        else:
+            bar_top = min_dim['y']
+            bar_bottom = min_dim['y'] + round(dy * (abs(hourly_price) / max_abs_price))
+
         if datetime.now().hour == hour:
             draw.rectangle([bar_left - 2, min_dim['y'] + 1,
-                            bar_right + 2, bar_bottom - 1], fill=colours[1])
+                            bar_right + 2, max_dim['y'] - 1], fill=colours[1])
 
-        draw.rectangle([bar_left, bar_top, bar_right,
-                        bar_bottom], fill=colours[0])
+        draw.rectangle([bar_left, bar_top, bar_right, bar_bottom], fill=colours[0])
 
     font_bold = ImageFont.load(
         '/usr/share/fonts/X11/misc/ter-u16b_unicode.pil')
