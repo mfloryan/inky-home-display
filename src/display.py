@@ -12,23 +12,30 @@ def draw_energy_price_graph(draw, colours, day_hourly_prices):
 
     hourly_price_max = max(day_hourly_prices)
     hourly_price_min = min(day_hourly_prices)
-    dy = max_dim['y'] - min_dim['y'] - 2
-    dx = max_dim['x'] - min_dim['x']
-    bar_width = round(dx / len(day_hourly_prices))
 
+    _draw_price_reference_lines(draw, colours, hourly_price_max, min_dim, max_dim)
+    _draw_hourly_price_bars(draw, colours, day_hourly_prices, min_dim, max_dim)
+    _draw_price_labels(draw, colours, day_hourly_prices, hourly_price_min, hourly_price_max)
+
+def _draw_price_reference_lines(draw, colours, hourly_price_max, min_dim, max_dim):
+    dy = max_dim['y'] - min_dim['y'] - 2
     if hourly_price_max > 1.0:
         highest_full_sek = math.floor(hourly_price_max)
-        one_sek_step = round(
-            ((highest_full_sek * dy) / hourly_price_max) / highest_full_sek)
+        one_sek_step = round(((highest_full_sek * dy) / hourly_price_max) / highest_full_sek)
 
         for y in range(highest_full_sek):
             for x in range(min_dim['x'] + 1, max_dim['x']):
                 if x % 2 == 0:
-                    draw.point(
-                        [x, max_dim['y'] - (one_sek_step * (y + 1))], fill=colours[0])
+                    draw.point([x, max_dim['y'] - (one_sek_step * (y + 1))], fill=colours[0])
 
-    # scale up to max value or 1 for small daily values
+def _draw_hourly_price_bars(draw, colours, day_hourly_prices, min_dim, max_dim):
+    dy = max_dim['y'] - min_dim['y'] - 2
+    dx = max_dim['x'] - min_dim['x']
+    bar_width = round(dx / len(day_hourly_prices))
+    hourly_price_max = max(day_hourly_prices)
+    hourly_price_min = min(day_hourly_prices)
     max_abs_price = max(abs(hourly_price_max), abs(hourly_price_min), 1.0)
+
     for hour, hourly_price in enumerate(day_hourly_prices):
         bar_left = (bar_width * hour + min_dim['x']) + 2
         bar_right = (bar_width * (hour + 1) + min_dim['x']) - 2
@@ -46,8 +53,8 @@ def draw_energy_price_graph(draw, colours, day_hourly_prices):
 
         draw.rectangle([bar_left, bar_top, bar_right, bar_bottom], fill=colours[0])
 
-    font_bold = ImageFont.load(
-        '/usr/share/fonts/X11/misc/ter-u16b_unicode.pil')
+def _draw_price_labels(draw, colours, day_hourly_prices, hourly_price_min, hourly_price_max):
+    font_bold = ImageFont.load('/usr/share/fonts/X11/misc/ter-u16b_unicode.pil')
     font = ImageFont.load('/usr/share/fonts/X11/misc/ter-u12n_unicode.pil')
 
     price_range_text = f"{round(hourly_price_min, 2)} -- {round(hourly_price_max, 2)} SEK"
