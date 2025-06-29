@@ -16,6 +16,10 @@ Python script generating an INKY screen display
 
 <https://github.com/pimoroni/inky/blob/master/examples/what/quotes-what.py>
 
+## Lint
+
+`ruff check . --fix`
+
 ## BUILD
 
 `docker build --pull --tag inky-display .`
