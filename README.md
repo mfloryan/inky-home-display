@@ -28,4 +28,4 @@ Python script generating an INKY screen display
 
 ## DEPLOY
 
-`rsync -arv --exclude '__pycache__/' src/ jagoda.mm.local:inky/`
+`rsync -arv --exclude '__pycache__/' src/ jagoda.mm:inky/`
