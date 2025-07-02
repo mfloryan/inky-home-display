@@ -1,9 +1,8 @@
 import math
 import locale
 from datetime import datetime
-from PIL import Image, ImageFont, ImageDraw
+from PIL import ImageFont, ImageDraw
 from display_backend import create_backend
-
 
 def draw_energy_price_graph(draw, colours, day_hourly_prices):
     min_dim = {'x': 6, 'y': 60}
@@ -137,7 +136,7 @@ def generate_content(draw, data, colours):
 
 def display(data, prefer_inky=True, png_output_path="img/test.png"):
     backend = create_backend(prefer_inky, png_output_path)
-    
+
     img = backend.create_image()
     draw = ImageDraw.Draw(img)
     colours = backend.colors
