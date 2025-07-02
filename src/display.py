@@ -2,7 +2,7 @@ import math
 import locale
 from datetime import datetime
 from PIL import Image, ImageFont, ImageDraw
-from inky.auto import auto
+from display_backend import create_backend
 
 
 def draw_energy_price_graph(draw, colours, day_hourly_prices):
@@ -73,7 +73,7 @@ def _draw_price_labels(draw, colours, day_hourly_prices, hourly_price_min, hourl
 def draw_energy_stats(draw, colours, data):
     font = ImageFont.truetype('/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf', 11)
     production_text = f"do sieci {round(data['production'], 2)} kWh {data['profit']:+.2f} SEK"
-    consumption_text = f"z sieci {round(data['consumption'], 2)} kWh {data['cost']:+.2f} SEK"
+    consumption_text = f"z sieci {round(data['consumption'], 2)} kWh {(-1) * data['cost']:+.2f} SEK"
 
     draw.text((270, 28), production_text, font=font, fill=colours[0], anchor="ra")
     draw.text((270, 42), consumption_text, font=font, fill=colours[0], anchor="ra")
@@ -135,28 +135,12 @@ def generate_content(draw, data, colours):
               now_text, font=font, fill=colours[1])
 
 
-def display(data):
-    inky_display = None
-    try:
-        inky_display = auto()
-        print("INKY wHat display:", inky_display.colour)
-    except RuntimeError:
-        print("No INKY display found, using file output instead")
-
-    if inky_display is None:
-        img = Image.new("P", size=(400, 300), color=(255, 255, 255))
-        draw = ImageDraw.Draw(img)
-        colours = ((0, 0, 0), (220, 220, 0), (255, 255, 255))
-    else:
-        img = Image.new("P", inky_display.resolution)
-        draw = ImageDraw.Draw(img)
-        colours = (inky_display.BLACK, inky_display.YELLOW, inky_display.WHITE)
+def display(data, prefer_inky=True, png_output_path="img/test.png"):
+    backend = create_backend(prefer_inky, png_output_path)
+    
+    img = backend.create_image()
+    draw = ImageDraw.Draw(img)
+    colours = backend.colors
 
     generate_content(draw, data, colours)
-
-    if inky_display is None:
-        img.save("img/test.png", format="PNG")
-    else:
-        inky_display.set_border(inky_display.WHITE)
-        inky_display.set_image(img)
-        inky_display.show()
+    backend.show(img)
