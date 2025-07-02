@@ -3,19 +3,9 @@
 from PIL import ImageFont
 
 
-def ubuntu_regular_22():
-    """Ubuntu Regular 22pt font."""
-    return ImageFont.truetype("/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf", 22)
-
-
-def ubuntu_regular_12():
-    """Ubuntu Regular 12pt font."""
-    return ImageFont.truetype("/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf", 12)
-
-
-def ubuntu_regular_11():
-    """Ubuntu Regular 11pt font."""
-    return ImageFont.truetype("/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf", 11)
+def ubuntu_regular(size):
+    """Ubuntu Regular font with specified size."""
+    return ImageFont.truetype("/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf", size)
 
 
 def terminus_bold_16():

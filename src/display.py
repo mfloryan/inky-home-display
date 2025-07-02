@@ -4,7 +4,7 @@ from datetime import datetime
 from PIL import ImageDraw
 from display_backend import create_backend
 from fonts import (
-    ubuntu_regular_22, ubuntu_regular_12, ubuntu_regular_11,
+    ubuntu_regular,
     terminus_bold_16, terminus_regular_12, terminus_bold_14, terminus_bold_22
 )
 
@@ -74,7 +74,7 @@ def _draw_price_labels(draw, colours, day_hourly_prices, hourly_price_min, hourl
 
 
 def draw_energy_stats(draw, colours, data):
-    font = ubuntu_regular_11()
+    font = ubuntu_regular(11)
     production_text = f"do sieci {round(data['production'], 2)} kWh {data['profit']:+.2f} SEK"
     consumption_text = f"z sieci {round(data['consumption'], 2)} kWh {(-1) * data['cost']:+.2f} SEK"
 
@@ -85,7 +85,7 @@ def draw_weather(draw, colours, data):
     font_sun = terminus_regular_12()
     font_header = terminus_bold_14()
     font_temp = terminus_bold_22()
-    font_label = ubuntu_regular_12()
+    font_label = ubuntu_regular(12)
     temperature_right = 390
 
     def draw_single_forecast(forecast, y):
@@ -117,7 +117,7 @@ def draw_weather(draw, colours, data):
 def generate_content(draw, data, colours):
     locale.setlocale(locale.LC_ALL, "pl_PL.utf8")
 
-    font22 = ubuntu_regular_22()
+    font22 = ubuntu_regular(22)
     draw.text((4, 0), datetime.now().strftime(
         '%A %d %B %Y'), font=font22, fill=colours[0])
 
