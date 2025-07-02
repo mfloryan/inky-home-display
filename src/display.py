@@ -1,8 +1,12 @@
 import math
 import locale
 from datetime import datetime
-from PIL import ImageFont, ImageDraw
+from PIL import ImageDraw
 from display_backend import create_backend
+from fonts import (
+    ubuntu_regular_22, ubuntu_regular_12, ubuntu_regular_11,
+    terminus_bold_16, terminus_regular_12, terminus_bold_14, terminus_bold_22
+)
 
 def draw_energy_price_graph(draw, colours, day_hourly_prices):
     min_dim = {'x': 6, 'y': 60}
@@ -53,8 +57,8 @@ def _draw_hourly_price_bars(draw, colours, day_hourly_prices, min_dim, max_dim):
         draw.rectangle([bar_left, bar_top, bar_right, bar_bottom], fill=colours[0])
 
 def _draw_price_labels(draw, colours, day_hourly_prices, hourly_price_min, hourly_price_max):
-    font_bold = ImageFont.load('/usr/share/fonts/X11/misc/ter-u16b_unicode.pil')
-    font = ImageFont.load('/usr/share/fonts/X11/misc/ter-u12n_unicode.pil')
+    font_bold = terminus_bold_16()
+    font = terminus_regular_12()
 
     price_range_text = f"{round(hourly_price_min, 2)} -- {round(hourly_price_max, 2)} SEK"
     draw.text((10, 28), price_range_text, font=font, fill=colours[0])
@@ -70,7 +74,7 @@ def _draw_price_labels(draw, colours, day_hourly_prices, hourly_price_min, hourl
 
 
 def draw_energy_stats(draw, colours, data):
-    font = ImageFont.truetype('/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf', 11)
+    font = ubuntu_regular_11()
     production_text = f"do sieci {round(data['production'], 2)} kWh {data['profit']:+.2f} SEK"
     consumption_text = f"z sieci {round(data['consumption'], 2)} kWh {(-1) * data['cost']:+.2f} SEK"
 
@@ -78,10 +82,10 @@ def draw_energy_stats(draw, colours, data):
     draw.text((270, 42), consumption_text, font=font, fill=colours[0], anchor="ra")
 
 def draw_weather(draw, colours, data):
-    font_sun = ImageFont.load('/usr/share/fonts/X11/misc/ter-u12n_unicode.pil')
-    font_header = ImageFont.load('/usr/share/fonts/X11/misc/ter-u14b_unicode.pil')
-    font_temp = ImageFont.load('/usr/share/fonts/X11/misc/ter-u22b_unicode.pil')
-    font_label = ImageFont.truetype("/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf", 12)
+    font_sun = terminus_regular_12()
+    font_header = terminus_bold_14()
+    font_temp = terminus_bold_22()
+    font_label = ubuntu_regular_12()
     temperature_right = 390
 
     def draw_single_forecast(forecast, y):
@@ -113,7 +117,7 @@ def draw_weather(draw, colours, data):
 def generate_content(draw, data, colours):
     locale.setlocale(locale.LC_ALL, "pl_PL.utf8")
 
-    font22 = ImageFont.truetype("/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf", 22)
+    font22 = ubuntu_regular_22()
     draw.text((4, 0), datetime.now().strftime(
         '%A %d %B %Y'), font=font22, fill=colours[0])
 
@@ -127,7 +131,7 @@ def generate_content(draw, data, colours):
         draw_weather(draw, colours, data['weather'])
 
     locale.setlocale(locale.LC_ALL, "en_GB.utf8")
-    font = ImageFont.load('/usr/share/fonts/X11/misc/ter-u12n_unicode.pil')
+    font = terminus_regular_12()
     now_text = "Updated: " + datetime.now().strftime('%c')
     now_size = draw.textbbox((0, 0), now_text, font=font)
     draw.text((400 - now_size[2], 300 - now_size[3]),
