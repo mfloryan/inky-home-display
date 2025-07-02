@@ -24,6 +24,18 @@ docker build --pull --tag inky-display .
 docker run --rm -v $(pwd)/out:/code/img/ -v $(pwd)/out/cache:/code/cache inky-display
 ```
 
+### Run with Options
+```bash
+# Force PNG output (skip Inky hardware detection)
+docker run --rm -v $(pwd)/out:/code/img/ -v $(pwd)/out/cache:/code/cache inky-display python update_display.py --png-only
+
+# Custom output filename
+docker run --rm -v $(pwd)/out:/code/img/ -v $(pwd)/out/cache:/code/cache inky-display python update_display.py --png-only --output img/my-display.png
+
+# On Raspberry Pi with Inky hardware (default behavior)
+python update_display.py
+```
+
 ### Deploy
 ```bash
 rsync -arv --exclude '__pycache__/' src/ jagoda.mm:inky/
