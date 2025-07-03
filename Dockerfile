@@ -42,13 +42,11 @@ ENV TZ=Europe/Stockholm
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# copy the content of the local src directory to the working directory
-COPY src/ .
-
 RUN mkdir img/
 VOLUME [ "/code/img" ]
 RUN mkdir -p cache
 VOLUME [ "/code/cache" ]
+VOLUME [ "/code/src" ]
 
 # command to run on container start
-CMD [ "python", "./update_display.py" ]
+CMD [ "python", "src/update_display.py" ]
