@@ -16,7 +16,10 @@ def ubuntu_regular(size):
 
 def terminus_bold_16():
     """Terminus Bold 16pt font."""
-    return ImageFont.load('/usr/share/fonts/X11/misc/ter-u16b_unicode.pil')
+    cache_key = f"terminus_bold_16"
+    if cache_key not in _font_cache:
+        _font_cache[cache_key] = ImageFont.load('/usr/share/fonts/X11/misc/ter-u16b_unicode.pil')
+    return _font_cache[cache_key]
 
 
 def terminus_regular_12():
