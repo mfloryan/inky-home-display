@@ -12,6 +12,8 @@ services:
     build: .
     volumes:
       - ./src:/code/src
+      - ./tests:/code/tests
       - ./out:/code/img
       - ./out/cache:/code/cache
+      - ./pyproject.toml:/code/pyproject.toml
     # Override command when running: docker-compose run inky-display-dev python src/update_display.py --png-only --output img/custom.png
