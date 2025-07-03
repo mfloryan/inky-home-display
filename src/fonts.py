@@ -27,14 +27,17 @@ def terminus_bold_16():
 
 def terminus_regular_12():
     """Terminus Regular 12pt font."""
-    return ImageFont.load('/usr/share/fonts/X11/misc/ter-u12n_unicode.pil')
+    return _cached_font("terminus_regular_12", 
+                       lambda: ImageFont.load('/usr/share/fonts/X11/misc/ter-u12n_unicode.pil'))
 
 
 def terminus_bold_14():
     """Terminus Bold 14pt font."""
-    return ImageFont.load('/usr/share/fonts/X11/misc/ter-u14b_unicode.pil')
+    return _cached_font("terminus_bold_14", 
+                       lambda: ImageFont.load('/usr/share/fonts/X11/misc/ter-u14b_unicode.pil'))
 
 
 def terminus_bold_22():
     """Terminus Bold 22pt font."""
-    return ImageFont.load('/usr/share/fonts/X11/misc/ter-u22b_unicode.pil')
+    return _cached_font("terminus_bold_22", 
+                       lambda: ImageFont.load('/usr/share/fonts/X11/misc/ter-u22b_unicode.pil'))
