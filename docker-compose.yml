@@ -1,0 +1,17 @@
+services:
+  inky-display:
+    build: .
+    volumes:
+      - ./src:/code/src
+      - ./out:/code/img
+      - ./out/cache:/code/cache
+    command: python src/update_display.py --png-only
+    
+  # Alternative service for running with different options
+  inky-display-dev:
+    build: .
+    volumes:
+      - ./src:/code/src
+      - ./out:/code/img
+      - ./out/cache:/code/cache
+    # Override command when running: docker-compose run inky-display-dev python src/update_display.py --png-only --output img/custom.png

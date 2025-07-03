@@ -18,22 +18,28 @@ ruff check . --fix
 pytest
 ```
 
-### Build (Docker)
+### Docker Development
 ```bash
-docker build --pull --tag inky-display .
-docker run --rm -v $(pwd)/src:/code/src -v $(pwd)/out:/code/img/ -v $(pwd)/out/cache:/code/cache inky-display
+# Build once
+docker-compose build
+
+# Run with PNG output (default)
+docker-compose run --rm inky-display
+
+# Run with custom options
+docker-compose run --rm inky-display-dev python src/update_display.py --png-only --output img/custom.png
+
+# Run tests
+docker-compose run --rm inky-display-dev python -m pytest
 ```
 
-### Run with Options
+### Direct Usage
 ```bash
-# Force PNG output (skip Inky hardware detection)
-docker run --rm -v $(pwd)/src:/code/src -v $(pwd)/out:/code/img/ -v $(pwd)/out/cache:/code/cache inky-display python src/update_display.py --png-only
-
-# Custom output filename
-docker run --rm -v $(pwd)/src:/code/src -v $(pwd)/out:/code/img/ -v $(pwd)/out/cache:/code/cache inky-display python src/update_display.py --png-only --output img/my-display.png
-
 # On Raspberry Pi with Inky hardware (default behavior)
 python src/update_display.py
+
+# On Mac/Linux with PNG output
+python src/update_display.py --png-only
 ```
 
 ### Deploy

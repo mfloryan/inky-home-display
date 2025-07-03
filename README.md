@@ -20,22 +20,33 @@ Python script generating an INKY screen display
 
 `ruff check . --fix`
 
-## BUILD
+## DOCKER DEVELOPMENT
 
-`docker build --pull --tag inky-display .`
+### Build once
 
-`docker run --rm -v (pwd)/src:/code/src -v (pwd)/out:/code/img/ -v (pwd)/out/cache:/code/cache inky-display`
+`docker-compose build`
 
-## RUN OPTIONS
+### Run with PNG output (default)
 
-### Force PNG output (skip Inky hardware detection)
-`docker run --rm -v (pwd)/src:/code/src -v (pwd)/out:/code/img/ -v (pwd)/out/cache:/code/cache inky-display python src/update_display.py --png-only`
+`docker-compose run --rm inky-display`
 
-### Custom output filename
-`docker run --rm -v (pwd)/src:/code/src -v (pwd)/out:/code/img/ -v (pwd)/out/cache:/code/cache inky-display python src/update_display.py --png-only --output img/my-display.png`
+### Run with custom options
 
-### On Raspberry Pi with Inky hardware (default behavior)
+`docker-compose run --rm inky-display-dev python src/update_display.py --png-only --output img/custom.png`
+
+### Run tests
+
+`docker-compose run --rm inky-display-dev python -m pytest`
+
+## DIRECT USAGE
+
+### On Raspberry Pi with Inky hardware (default behaviour)
+
 `python src/update_display.py`
+
+### On Mac/Linux with PNG output
+
+`python src/update_display.py --png-only`
 
 ## DEPLOY
 
