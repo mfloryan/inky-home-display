@@ -20,6 +20,7 @@ def draw_energy_price_graph(draw, colours, day_hourly_prices):
     _draw_hourly_price_bars(draw, colours, day_hourly_prices, min_dim, max_dim)
     _draw_price_labels(draw, colours, day_hourly_prices, hourly_price_min, hourly_price_max)
 
+
 def _draw_price_reference_lines(draw, colours, hourly_price_max, min_dim, max_dim):
     dy = max_dim['y'] - min_dim['y'] - 2
     if hourly_price_max > 1.0:
@@ -56,6 +57,7 @@ def _draw_hourly_price_bars(draw, colours, day_hourly_prices, min_dim, max_dim):
 
         draw.rectangle([bar_left, bar_top, bar_right, bar_bottom], fill=colours[0])
 
+
 def _draw_price_labels(draw, colours, day_hourly_prices, hourly_price_min, hourly_price_max):
     font_bold = terminus_bold_16()
     font = terminus_regular_12()
@@ -81,6 +83,7 @@ def draw_energy_stats(draw, colours, data):
     draw.text((270, 28), production_text, font=font, fill=colours[0], anchor="ra")
     draw.text((270, 42), consumption_text, font=font, fill=colours[0], anchor="ra")
 
+
 def draw_weather(draw, colours, data):
     font_sun = terminus_regular_12()
     font_header = terminus_bold_14()
@@ -98,9 +101,9 @@ def draw_weather(draw, colours, data):
         y += 26
         return y
 
-    draw.text((300, 8), "pogoda", font=font_header, fill=colours[1])
+    draw.text((300, 6), "POGODA", font=font_header, fill=colours[1])
     draw.text((300, 20), data['name'], font=font_label, fill=colours[0])
-    draw.ellipse([(288, 36), (298, 46)], fill=colours[1])
+    draw.ellipse([(286, 36), (297, 47)], fill=colours[1])
     draw.text((300, 36), f"{data['sunrise'].strftime('%H:%M')}-{data['sunset'].strftime('%H:%M')}",
               font=font_sun,
               fill=colours[0])
