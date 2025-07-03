@@ -1,6 +1,5 @@
 import math
 import locale
-from datetime import datetime
 from PIL import ImageDraw
 from display_backend import create_backend
 from fonts import (
@@ -8,7 +7,7 @@ from fonts import (
     terminus_bold_16, terminus_regular_12, terminus_bold_14, terminus_bold_22
 )
 
-def draw_energy_price_graph(draw, colours, day_hourly_prices):
+def draw_energy_price_graph(draw, colours, day_hourly_prices, current_time):
     min_dim = {'x': 6, 'y': 60}
     max_dim = {'x': 270, 'y': 284}
     draw.rectangle([min_dim['x'], min_dim['y'], max_dim['x'], max_dim['y']], outline=colours[0])
@@ -17,8 +16,8 @@ def draw_energy_price_graph(draw, colours, day_hourly_prices):
     hourly_price_min = min(day_hourly_prices)
 
     _draw_price_reference_lines(draw, colours, hourly_price_max, min_dim, max_dim)
-    _draw_hourly_price_bars(draw, colours, day_hourly_prices, min_dim, max_dim)
-    _draw_price_labels(draw, colours, day_hourly_prices, hourly_price_min, hourly_price_max)
+    _draw_hourly_price_bars(draw, colours, day_hourly_prices, min_dim, max_dim, current_time)
+    _draw_price_labels(draw, colours, day_hourly_prices, hourly_price_min, hourly_price_max, current_time)
 
 
 def _draw_price_reference_lines(draw, colours, hourly_price_max, min_dim, max_dim):
@@ -32,7 +31,8 @@ def _draw_price_reference_lines(draw, colours, hourly_price_max, min_dim, max_di
                 if x % 2 == 0:
                     draw.point([x, max_dim['y'] - (one_sek_step * (y + 1))], fill=colours[0])
 
-def _draw_hourly_price_bars(draw, colours, day_hourly_prices, min_dim, max_dim):
+
+def _draw_hourly_price_bars(draw, colours, day_hourly_prices, min_dim, max_dim, current_time):
     dy = max_dim['y'] - min_dim['y'] - 2
     dx = max_dim['x'] - min_dim['x']
     bar_width = round(dx / len(day_hourly_prices))
@@ -51,14 +51,14 @@ def _draw_hourly_price_bars(draw, colours, day_hourly_prices, min_dim, max_dim):
             bar_top = min_dim['y']
             bar_bottom = min_dim['y'] + round(dy * (abs(hourly_price) / max_abs_price))
 
-        if datetime.now().hour == hour:
+        if current_time.hour == hour:
             draw.rectangle([bar_left - 2, min_dim['y'] + 1,
                             bar_right + 2, max_dim['y'] - 1], fill=colours[1])
 
         draw.rectangle([bar_left, bar_top, bar_right, bar_bottom], fill=colours[0])
 
 
-def _draw_price_labels(draw, colours, day_hourly_prices, hourly_price_min, hourly_price_max):
+def _draw_price_labels(draw, colours, day_hourly_prices, hourly_price_min, hourly_price_max, current_time):
     font_bold = terminus_bold_16()
     font = terminus_regular_12()
 
@@ -67,7 +67,7 @@ def _draw_price_labels(draw, colours, day_hourly_prices, hourly_price_min, hourl
 
     now_price_baseline = 42
     now_price_left = 10
-    now_price_text = f"now: {round(day_hourly_prices[datetime.now().hour], 2)} SEK"
+    now_price_text = f"now: {round(day_hourly_prices[current_time.hour], 2)} SEK"
     draw.rectangle(
         [(now_price_left - 2, now_price_baseline - 1),
          (now_price_left - 2 + draw.textlength(now_price_text, font=font_bold) + 2, now_price_baseline + 13)],
@@ -121,11 +121,11 @@ def generate_content(draw, data, colours):
     locale.setlocale(locale.LC_ALL, "pl_PL.utf8")
 
     font22 = ubuntu_regular(22)
-    draw.text((4, 0), datetime.now().strftime(
+    draw.text((4, 0), data['current_time'].strftime(
         '%A %d %B %Y'), font=font22, fill=colours[0])
 
     if data['energy_prices']:
-        draw_energy_price_graph(draw, colours, data['energy_prices'])
+        draw_energy_price_graph(draw, colours, data['energy_prices'], data['current_time'])
 
     if data['energy_stats']:
         draw_energy_stats(draw, colours, data['energy_stats'])
@@ -135,7 +135,7 @@ def generate_content(draw, data, colours):
 
     locale.setlocale(locale.LC_ALL, "en_GB.utf8")
     font = terminus_regular_12()
-    now_text = "Updated: " + datetime.now().strftime('%c')
+    now_text = "Updated: " + data['current_time'].strftime('%c')
     now_size = draw.textbbox((0, 0), now_text, font=font)
     draw.text((400 - now_size[2], 300 - now_size[3]),
               now_text, font=font, fill=colours[1])

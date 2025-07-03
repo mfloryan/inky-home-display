@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+from datetime import datetime
 from display import display
 from tibber import tibber_energy_prices, tibber_energy_stats
 from weather import get_weather
@@ -21,6 +22,7 @@ def main():
         "energy_prices": tibber_energy_prices(),
         "energy_stats": tibber_energy_stats(),
         "weather": get_weather(),
+        "current_time": datetime.now(),
     }
     # transport = getDeparturesBasedOnTimeOfDay()
     # print(transport)
