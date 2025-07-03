@@ -2,10 +2,16 @@
 
 from PIL import ImageFont
 
+# Simple font cache
+_font_cache = {}
+
 
 def ubuntu_regular(size):
     """Ubuntu Regular font with specified size."""
-    return ImageFont.truetype("/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf", size)
+    cache_key = f"ubuntu_regular_{size}"
+    if cache_key not in _font_cache:
+        _font_cache[cache_key] = ImageFont.truetype("/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf", size)
+    return _font_cache[cache_key]
 
 
 def terminus_bold_16():
