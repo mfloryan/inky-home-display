@@ -3,6 +3,7 @@ import math
 import locale
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Protocol
 from PIL import ImageDraw
 from display_backend import create_backend
 from fonts import (
@@ -27,12 +28,27 @@ class Rectangle:
         return self.y + self.height
 
 
+class DrawProtocol(Protocol):
+    def text(self, xy, text, **kwargs): ...
+
+
+class TranslatedDraw:
+    def __init__(self, draw: DrawProtocol, offset_x: int, offset_y: int):
+        self.draw = draw
+        self.offset_x = offset_x
+        self.offset_y = offset_y
+    
+    def text(self, xy, text, **kwargs):
+        translated_xy = (xy[0] + self.offset_x, xy[1] + self.offset_y)
+        return self.draw.text(translated_xy, text, **kwargs)
+
+
 class Widget(ABC):
     def __init__(self, bounds: Rectangle):
         self.bounds = bounds
 
     @abstractmethod
-    def render(self, draw: ImageDraw, colours: list) -> None:
+    def render(self, draw: DrawProtocol, colours: list) -> None:
         pass
 
 
@@ -41,7 +57,7 @@ class HeaderWidget(Widget):
           super().__init__(bounds)
           self.current_time = current_time
 
-    def render(self, draw: ImageDraw, colours: list) -> None:
+    def render(self, draw: DrawProtocol, colours: list) -> None:
         locale.setlocale(locale.LC_ALL, "pl_PL.utf8")
         font = ubuntu_regular(22)
         date_text = self.current_time.strftime('%A %d %B %Y')
@@ -159,11 +175,11 @@ def draw_weather(draw, colours, data):
 
 
 def generate_content(draw, data, colours):
-    locale.setlocale(locale.LC_ALL, "pl_PL.utf8")
+    header_widget = HeaderWidget(Rectangle(4, 0, 396, 25), data['current_time'])
+    translated_draw = TranslatedDraw(draw, header_widget.bounds.x, header_widget.bounds.y)
+    header_widget.render(translated_draw, colours)
 
-    font22 = ubuntu_regular(22)
-    draw.text((4, 0), data['current_time'].strftime(
-        '%A %d %B %Y'), font=font22, fill=colours[0])
+    locale.setlocale(locale.LC_ALL, "pl_PL.utf8")
 
     if data['energy_prices']:
         draw_energy_price_graph(draw, colours, data['energy_prices'], data['current_time'])
