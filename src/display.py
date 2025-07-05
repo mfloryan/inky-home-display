@@ -1,3 +1,4 @@
+import datetime
 import math
 import locale
 from abc import ABC, abstractmethod
@@ -31,15 +32,19 @@ class Widget(ABC):
         self.bounds = bounds
 
     @abstractmethod
-    def render(self, draw: ImageDraw, colours: list, data: dict) -> None:
+    def render(self, draw: ImageDraw, colours: list) -> None:
         pass
 
 
 class HeaderWidget(Widget):
-    def render(self, draw: ImageDraw, colours: list, data: dict) -> None:
+    def __init__(self, bounds: Rectangle, current_time: datetime.datetime):
+          super().__init__(bounds)
+          self.current_time = current_time
+
+    def render(self, draw: ImageDraw, colours: list) -> None:
         locale.setlocale(locale.LC_ALL, "pl_PL.utf8")
         font = ubuntu_regular(22)
-        date_text = data['current_time'].strftime('%A %d %B %Y')
+        date_text = self.current_time.strftime('%A %d %B %Y')
         draw.text((0, 0), date_text, font=font, fill=colours[0])
 
 
