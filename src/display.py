@@ -26,6 +26,14 @@ class Rectangle:
         return self.y + self.height
 
 
+class Widget(ABC):
+    def __init__(self, bounds: Rectangle):
+        self.bounds = bounds
+
+    @abstractmethod
+    def render(self, draw: ImageDraw, colours: list, data: dict) -> None:
+        pass
+
 def draw_energy_price_graph(draw, colours, day_hourly_prices, current_time):
     min_dim = {'x': 6, 'y': 60}
     max_dim = {'x': 270, 'y': 284}
