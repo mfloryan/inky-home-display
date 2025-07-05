@@ -29,6 +29,8 @@ Using `pytest` to execute test. Unit tests can be run locally (eg. on a Mac) but
 pytest
 ```
 
+**TODO**: Widget tests currently fail on Mac due to font dependencies. Need to mock font loading or run widget tests in Docker.
+
 ### Visual Regression Testing
 
 ```bash

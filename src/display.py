@@ -34,6 +34,15 @@ class Widget(ABC):
     def render(self, draw: ImageDraw, colours: list, data: dict) -> None:
         pass
 
+
+class HeaderWidget(Widget):
+    def render(self, draw: ImageDraw, colours: list, data: dict) -> None:
+        locale.setlocale(locale.LC_ALL, "pl_PL.utf8")
+        font = ubuntu_regular(22)
+        date_text = data['current_time'].strftime('%A %d %B %Y')
+        draw.text((0, 0), date_text, font=font, fill=colours[0])
+
+
 def draw_energy_price_graph(draw, colours, day_hourly_prices, current_time):
     min_dim = {'x': 6, 'y': 60}
     max_dim = {'x': 270, 'y': 284}
