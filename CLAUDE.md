@@ -10,6 +10,8 @@ Check @README.md for project overview and development commands
 
 - **`update_display.py`** - Main entry point that orchestrates data collection and display rendering
 - **`display.py`** - Core rendering logic for the e-paper display, handles layout and drawing
+- **`display_backend.py`** - Backend abstraction layer for different display outputs (Inky hardware vs PNG)
+- **`fonts.py`** - Font management and loading utilities for display rendering
 - **`tibber.py`** - Tibber energy API integration for electricity prices and consumption data
 - **`weather.py`** - OpenWeather API integration for weather forecasts and conditions
 - **`cache.py`** - File-based caching system to minimize API calls and improve performance
