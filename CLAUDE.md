@@ -76,6 +76,8 @@ The application targets a 3-color e-ink display (black, yellow, white) with spec
 - "Refactor display to use pluggable backend system" is an example of commit message _we want to avoid_
 - "More readable drawing of energy graph" is an example of _good_ commit message
 - Each commit message should be clear and concise and can be followed with details. Use emoji in the detailed description.
+- Include code changes with tests validating the changes in the same commit.
+- Any commit message that uses the word "and" is an indication the commit should be split into two (or more)
 
 ### Summary
 
