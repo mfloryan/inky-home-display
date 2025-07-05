@@ -1,11 +1,30 @@
 import math
 import locale
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from PIL import ImageDraw
 from display_backend import create_backend
 from fonts import (
     ubuntu_regular,
     terminus_bold_16, terminus_regular_12, terminus_bold_14, terminus_bold_22
 )
+
+
+@dataclass
+class Rectangle:
+    x: int
+    y: int
+    width: int
+    height: int
+
+    @property
+    def right(self) -> int:
+        return self.x + self.width
+
+    @property
+    def bottom(self) -> int:
+        return self.y + self.height
+
 
 def draw_energy_price_graph(draw, colours, day_hourly_prices, current_time):
     min_dim = {'x': 6, 'y': 60}
