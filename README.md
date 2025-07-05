@@ -1,44 +1,35 @@
 # INKY display rendering
 
-Python script generating an INKY screen display
+## Project Overview
 
-## Documentation
+Inky Home Display is a Python-based home automation dashboard that renders energy prices, weather forecasts, and public transport information to a Pimoroni Inky wHat e-paper display (400x300 pixels). The application integrates with Tibber (Swedish energy provider), OpenWeather API, and Stockholm public transport (SL) to create a smart home information panel.
 
-<https://pillow.readthedocs.io/en/stable/reference/ImageDraw.html#functions>
+## Reference Documentation
 
-### SL APIs
-
-<https://www.trafiklab.se/api/sl-realtidsinformation-4>
-
-## Hardware
+- [Pillow](https://pillow.readthedocs.io/en/stable/reference/ImageDraw.html#functions)
+- [SL APIs](https://www.trafiklab.se/api/sl-realtidsinformation-4)
 
 ## Some inspiration
 
 <https://github.com/pimoroni/inky/blob/master/examples/what/quotes-what.py>
 
-## Lint
+## Development
 
-`ruff check . --fix`
+### Linting
 
-## DOCKER DEVELOPMENT
+```bash
+ruff check . --fix
+```
 
-### Build once
+### Testing
 
-`docker-compose build`
+Using `pytest` to execute test. Unit tests can be run locally (eg. on a Mac) but end-to-end test require docker environment, these tests are marked as `manual`.
 
-### Run with PNG output (default)
+```bash
+pytest
+```
 
-`docker-compose run --rm inky-display`
-
-### Run with custom options
-
-`docker-compose run --rm inky-display-dev python src/update_display.py --png-only --output out/custom.png`
-
-### Run tests
-
-`docker-compose run --rm inky-display-dev python -m pytest`
-
-### Visual regression testing
+### Visual Regression Testing
 
 ```bash
 # Generate baseline images (run once or when display output changes)
@@ -53,16 +44,36 @@ Python script generating an INKY screen display
 
 Visual regression tests compare generated display images with baseline images to detect unintended changes. Failed tests generate diff images in `out/test-results/` showing highlighted differences.
 
-## DIRECT USAGE
+## Docker Development
 
-### On Raspberry Pi with Inky hardware (default behaviour)
+The code requires locale data, unix fonts and `inky` library not available on a Mac. Hence some development uses **docker** to run the code fully.
 
-`python src/update_display.py`
+```bash
+# Build once
+docker-compose build
 
-### On Mac/Linux with PNG output
+# Run with PNG output (default)
+docker-compose run --rm inky-display
 
-`python src/update_display.py --png-only`
+# Run with custom options
+docker-compose run --rm inky-display-dev python src/update_display.py --png-only --output out/custom.png
 
-## DEPLOY
+# Run tests in docker
+docker-compose run --rm inky-display-dev python -m pytest
+```
 
-`rsync -arv --exclude '__pycache__/' src/ jagoda.mm:inky/`
+### Direct Usage
+
+```bash
+# On Raspberry Pi with Inky hardware (default behavior)
+python src/update_display.py
+
+# On Mac/Linux with PNG output
+python src/update_display.py --png-only
+```
+
+### Deployment
+
+```bash
+rsync -arv --exclude '__pycache__/' src/ jagoda.mm:inky/
+```

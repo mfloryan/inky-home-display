@@ -2,64 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
-
-Inky Home Display is a Python-based home automation dashboard that renders energy prices, weather forecasts, and public transport information to a Pimoroni Inky wHat e-paper display (400x300 pixels). The application integrates with Tibber (Swedish energy provider), OpenWeather API, and Stockholm public transport (SL) to create a smart home information panel.
-
-## Development Commands
-
-### Linting
-```bash
-ruff check . --fix
-```
-
-### Testing
-```bash
-pytest
-```
-
-### Visual Regression Testing
-```bash
-# Generate baseline images (run once or when display output changes)
-./test-visual-regression.sh gen
-
-# Run visual regression tests (default)
-./test-visual-regression.sh
-
-# Run visual regression tests explicitly
-./test-visual-regression.sh test
-```
-
-Visual regression tests compare generated display images with baseline images to detect unintended changes. Failed tests generate diff images in `out/test-results/` showing highlighted differences.
-
-### Docker Development
-```bash
-# Build once
-docker-compose build
-
-# Run with PNG output (default)
-docker-compose run --rm inky-display
-
-# Run with custom options
-docker-compose run --rm inky-display-dev python src/update_display.py --png-only --output out/custom.png
-
-# Run tests
-docker-compose run --rm inky-display-dev python -m pytest
-```
-
-### Direct Usage
-```bash
-# On Raspberry Pi with Inky hardware (default behavior)
-python src/update_display.py
-
-# On Mac/Linux with PNG output
-python src/update_display.py --png-only
-```
-
-### Deploy
-```bash
-rsync -arv --exclude '__pycache__/' src/ jagoda.mm:inky/
-```
+Check @README.md for project overview and development commands
 
 ## Architecture
 
@@ -116,13 +59,21 @@ The application targets a 3-color e-ink display (black, yellow, white) with spec
 - **Coverage targets**: 100% coverage should be expected at all times, but these tests must ALWAYS be based on business behaviour, not implementation details
 - Tests must document expected behaviour
 
-
 ### Code Style
 
 - Python 3.11 target
 - Ruff linter with 88-character line length
 - Double quotes for strings
 - Tests use pytest with `src/` in Python path
+- Avoid writing code comments. All code should be readable and self-documenting though clear structure, meaningful variable and method names
+
+### Git Commits
+
+- Do not follow the usual "tell" commit messages style
+- Commit messages should read like a history of the project explaining what has changed as a result of the commit
+- "Refactor display to use pluggable backend system" is an example of commit message _we want to avoid_
+- "More readable drawing of energy graph" is an example of _good_ commit message
+- Each commit message should be clear and concise and can be followed with details. Use emoji in the detailed description.
 
 ### Summary
 
