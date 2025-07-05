@@ -13,8 +13,8 @@ def main():
     parser = argparse.ArgumentParser(description='Update Inky home display')
     parser.add_argument('--png-only', action='store_true',
                         help='Force PNG output, do not try to use Inky hardware')
-    parser.add_argument('--output', default='img/test.png',
-                        help='PNG output file path (default: img/test.png)')
+    parser.add_argument('--output', default='out/test.png',
+                        help='PNG output file path (default: out/test.png)')
 
     args = parser.parse_args()
 

@@ -83,7 +83,7 @@ class InkyBackend(DisplayBackend):
         self.inky_display.show()
 
 
-def create_backend(prefer_inky=True, png_output_path="img/test.png"):
+def create_backend(prefer_inky=True, png_output_path="out/test.png"):
     """Create the appropriate display backend based on availability."""
 
     if prefer_inky:

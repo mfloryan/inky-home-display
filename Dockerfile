@@ -42,8 +42,8 @@ ENV TZ=Europe/Stockholm
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN mkdir img/
-VOLUME [ "/code/img" ]
+RUN mkdir out/
+VOLUME [ "/code/out" ]
 RUN mkdir -p cache
 VOLUME [ "/code/cache" ]
 VOLUME [ "/code/src" ]

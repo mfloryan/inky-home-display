@@ -4,4 +4,4 @@ inky==2.1.0
 fonts==0.0.3
 requests==2.32.4
 pytest==8.3.4
-
+pytest-mpl==0.17.0

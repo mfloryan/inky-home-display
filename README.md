@@ -32,11 +32,26 @@ Python script generating an INKY screen display
 
 ### Run with custom options
 
-`docker-compose run --rm inky-display-dev python src/update_display.py --png-only --output img/custom.png`
+`docker-compose run --rm inky-display-dev python src/update_display.py --png-only --output out/custom.png`
 
 ### Run tests
 
 `docker-compose run --rm inky-display-dev python -m pytest`
+
+### Visual regression testing
+
+```bash
+# Generate baseline images (run once or when display output changes)
+./test-visual-regression.sh gen
+
+# Run visual regression tests (default)
+./test-visual-regression.sh
+
+# Run visual regression tests explicitly
+./test-visual-regression.sh test
+```
+
+Visual regression tests compare generated display images with baseline images to detect unintended changes. Failed tests generate diff images in `out/test-results/` showing highlighted differences.
 
 ## DIRECT USAGE
 
