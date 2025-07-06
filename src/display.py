@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Protocol
 from PIL import ImageDraw
 from display_backend import create_backend
-from fonts import FontLoader
+from fonts import FontLoader, terminus_bold_16, terminus_regular_12, terminus_bold_14, terminus_bold_22, ubuntu_regular
 
 
 @dataclass
@@ -290,7 +290,9 @@ def draw_weather(draw, colours, data):
 
 
 def generate_content(draw, data, colours):
-    header_widget = HeaderWidget(Rectangle(4, 0, 396, 25), data["current_time"])
+    font_loader = FontLoader()
+    
+    header_widget = HeaderWidget(Rectangle(4, 0, 396, 25), font_loader, data["current_time"])
     translated_draw = TranslatedDraw(
         draw, header_widget.bounds.x, header_widget.bounds.y
     )
@@ -311,7 +313,7 @@ def generate_content(draw, data, colours):
             cost=data["energy_stats"]["cost"],
         )
         energy_stats_widget = EnergyStatsWidget(
-            Rectangle(270, 28, 400 - 270, 100), energy_data
+            Rectangle(270, 28, 400 - 270, 100), font_loader, energy_data
         )
         translated_draw = TranslatedDraw(
             draw, energy_stats_widget.bounds.x, energy_stats_widget.bounds.y
