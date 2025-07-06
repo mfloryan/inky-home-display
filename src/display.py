@@ -6,13 +6,7 @@ from dataclasses import dataclass
 from typing import Protocol
 from PIL import ImageDraw
 from display_backend import create_backend
-from fonts import (
-    ubuntu_regular,
-    terminus_bold_16,
-    terminus_regular_12,
-    terminus_bold_14,
-    terminus_bold_22,
-)
+from fonts import FontLoader
 
 
 @dataclass
@@ -56,13 +50,14 @@ class Widget(ABC):
 
 
 class HeaderWidget(Widget):
-    def __init__(self, bounds: Rectangle, current_time: datetime.datetime):
+    def __init__(self, bounds: Rectangle, font_loader: FontLoader, current_time: datetime.datetime):
         super().__init__(bounds)
+        self.font_loader = font_loader
         self.current_time = current_time
 
     def render(self, draw: DrawProtocol, colours: list) -> None:
         locale.setlocale(locale.LC_ALL, "pl_PL.utf8")
-        font = ubuntu_regular(22)
+        font = self.font_loader.ubuntu_regular(22)
         date_text = self.current_time.strftime("%A %d %B %Y")
         draw.text((0, 0), date_text, font=font, fill=colours[0])
 
@@ -75,18 +70,68 @@ class EnergyData:
     cost: float
 
 
+@dataclass
+class EnergyPriceData:
+    day_hourly_prices: list[float]
+    current_hour: int
+
+
 class EnergyStatsWidget(Widget):
-    def __init__(self, bounds: Rectangle, energy_data: EnergyData):
+    def __init__(self, bounds: Rectangle, font_loader: FontLoader, energy_data: EnergyData):
         super().__init__(bounds)
+        self.font_loader = font_loader
         self.energy_data = energy_data
 
     def render(self, draw: DrawProtocol, colours: list) -> None:
-        font = ubuntu_regular(11)
+        font = self.font_loader.ubuntu_regular(11)
         production_text = f"do sieci {round(self.energy_data.production, 2)} kWh {self.energy_data.profit:+.2f} SEK"
         consumption_text = f"z sieci {round(self.energy_data.consumption, 2)} kWh {(-1) * self.energy_data.cost:+.2f} SEK"
 
         draw.text((0, 0), production_text, font=font, fill=colours[0], anchor="ra")
         draw.text((0, 14), consumption_text, font=font, fill=colours[0], anchor="ra")
+
+
+class EnergyPriceLabelsWidget(Widget):
+    def __init__(self, bounds: Rectangle, font_loader: FontLoader, price_data: EnergyPriceData):
+        super().__init__(bounds)
+        self.font_loader = font_loader
+        self.price_data = price_data
+
+    def render(self, draw: DrawProtocol, colours: list) -> None:
+        hourly_price_max = max(self.price_data.day_hourly_prices)
+        hourly_price_min = min(self.price_data.day_hourly_prices)
+
+        font_bold = self.font_loader.terminus_bold_16()
+        font = self.font_loader.terminus_regular_12()
+
+        price_range_text = (
+            f"{round(hourly_price_min, 2)} -- {round(hourly_price_max, 2)} SEK"
+        )
+        draw.text((0, 0), price_range_text, font=font, fill=colours[0])
+
+        now_price_baseline = 14
+        now_price_left = 0
+        now_price_text = f"now: {round(self.price_data.day_hourly_prices[self.price_data.current_hour], 2)} SEK"
+        draw.rectangle(
+            [
+                (now_price_left - 2, now_price_baseline - 1),
+                (
+                    now_price_left
+                    - 2
+                    + draw.textlength(now_price_text, font=font_bold)
+                    + 2,
+                    now_price_baseline + 13,
+                ),
+            ],
+            outline=colours[1],
+            width=1,
+        )
+        draw.text(
+            (now_price_left, now_price_baseline),
+            now_price_text,
+            font=font_bold,
+            fill=colours[0],
+        )
 
 
 def draw_energy_price_graph(draw, colours, day_hourly_prices, current_time):
@@ -195,19 +240,6 @@ def _draw_price_labels(
     )
 
 
-def draw_energy_stats(draw, colours, data):
-    font = ubuntu_regular(11)
-    production_text = (
-        f"do sieci {round(data['production'], 2)} kWh {data['profit']:+.2f} SEK"
-    )
-    consumption_text = (
-        f"z sieci {round(data['consumption'], 2)} kWh {(-1) * data['cost']:+.2f} SEK"
-    )
-
-    draw.text((270, 28), production_text, font=font, fill=colours[0], anchor="ra")
-    draw.text((270, 42), consumption_text, font=font, fill=colours[0], anchor="ra")
-
-
 def draw_weather(draw, colours, data):
     font_sun = terminus_regular_12()
     font_header = terminus_bold_14()
@@ -272,7 +304,19 @@ def generate_content(draw, data, colours):
         )
 
     if data["energy_stats"]:
-        draw_energy_stats(draw, colours, data["energy_stats"])
+        energy_data = EnergyData(
+            production=data["energy_stats"]["production"],
+            consumption=data["energy_stats"]["consumption"],
+            profit=data["energy_stats"]["profit"],
+            cost=data["energy_stats"]["cost"],
+        )
+        energy_stats_widget = EnergyStatsWidget(
+            Rectangle(270, 28, 400 - 270, 100), energy_data
+        )
+        translated_draw = TranslatedDraw(
+            draw, energy_stats_widget.bounds.x, energy_stats_widget.bounds.y
+        )
+        energy_stats_widget.render(translated_draw, colours)
 
     if data["weather"]:
         draw_weather(draw, colours, data["weather"])

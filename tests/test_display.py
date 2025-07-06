@@ -1,16 +1,17 @@
 import datetime
 from unittest.mock import MagicMock
 
-from display import Rectangle, HeaderWidget, EnergyStatsWidget, EnergyData
+from display import Rectangle, HeaderWidget, EnergyStatsWidget, EnergyData, EnergyPriceLabelsWidget, EnergyPriceData
 from display_backend import PngFileBackend
+from fonts import FontLoader
 
 
 class TestHeaderWidget:
     def test_header_widget_renders_polish_date_at_widget_origin(self):
-
         bounds = Rectangle(4, 0, 396, 25)
         current_time = datetime.datetime(2023, 12, 25, 14, 30)
-        widget = HeaderWidget(bounds, current_time)
+        mock_font_loader = MagicMock()
+        widget = HeaderWidget(bounds, mock_font_loader, current_time)
 
         mock_draw = MagicMock()
         backend = PngFileBackend()
@@ -39,7 +40,8 @@ class TestEnergyStatsWidget:
             profit=1.25,
             cost=0.95
         )
-        widget = EnergyStatsWidget(bounds, energy_data)
+        mock_font_loader = MagicMock()
+        widget = EnergyStatsWidget(bounds, mock_font_loader, energy_data)
 
         mock_draw = MagicMock()
         backend = PngFileBackend()
@@ -63,3 +65,43 @@ class TestEnergyStatsWidget:
         assert "z sieci 1.8 kWh -0.95 SEK" == consumption_call[0][1]
         assert consumption_call[1]["anchor"] == "ra"
         assert consumption_call[1]["fill"] == colours[0]
+
+
+class TestEnergyPriceLabelsWidget:
+    def test_energy_price_labels_widget_renders_range_and_current_price(self):
+        bounds = Rectangle(10, 28, 260, 30)
+        price_data = EnergyPriceData(
+            day_hourly_prices=[0.85, 0.92, 1.15, 1.22, 1.18, 0.95],
+            current_hour=2
+        )
+        mock_font_loader = MagicMock()
+        widget = EnergyPriceLabelsWidget(bounds, mock_font_loader, price_data)
+
+        mock_draw = MagicMock()
+        backend = PngFileBackend()
+        colours = backend.colors
+
+        widget.render(mock_draw, colours)
+
+        # Should have 3 calls: range text, current price box, current price text
+        assert mock_draw.text.call_count == 2
+        assert mock_draw.rectangle.call_count == 1
+
+        text_calls = mock_draw.text.call_args_list
+        rect_call = mock_draw.rectangle.call_args
+
+        # First text call: price range at (0, 0)
+        range_call = text_calls[0]
+        assert range_call[0][0] == (0, 0)
+        assert "0.85 -- 1.22 SEK" == range_call[0][1]
+        assert range_call[1]["fill"] == colours[0]
+
+        # Rectangle for current price box
+        assert rect_call[1]["outline"] == colours[1]
+        assert rect_call[1]["width"] == 1
+
+        # Second text call: current price at (0, 14)
+        current_call = text_calls[1]
+        assert current_call[0][0] == (0, 14)
+        assert "now: 1.15 SEK" == current_call[0][1]
+        assert current_call[1]["fill"] == colours[0]

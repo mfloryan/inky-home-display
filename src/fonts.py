@@ -1,43 +1,51 @@
-"""Font loading functions for the display."""
-
 from PIL import ImageFont
 
-# Simple font cache
-_font_cache = {}
+
+class FontLoader:
+    def __init__(self):
+        self._cache = {}
+
+    def _cached_font(self, cache_key, loader_func):
+        if cache_key not in self._cache:
+            self._cache[cache_key] = loader_func()
+        return self._cache[cache_key]
+
+    def ubuntu_regular(self, size):
+        return self._cached_font(
+            f"ubuntu_regular_{size}",
+            lambda: ImageFont.truetype(
+                "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf", size
+            ),
+        )
+
+    def terminus_bold_16(self):
+        return self._cached_font(
+            "terminus_bold_16",
+            lambda: ImageFont.load("/usr/share/fonts/X11/misc/ter-u16b_unicode.pil"),
+        )
+
+    def terminus_regular_12(self):
+        return self._cached_font(
+            "terminus_regular_12",
+            lambda: ImageFont.load("/usr/share/fonts/X11/misc/ter-u12n_unicode.pil"),
+        )
+
+    def terminus_bold_14(self):
+        return self._cached_font(
+            "terminus_bold_14",
+            lambda: ImageFont.load("/usr/share/fonts/X11/misc/ter-u14b_unicode.pil"),
+        )
+
+    def terminus_bold_22(self):
+        return self._cached_font(
+            "terminus_bold_22",
+            lambda: ImageFont.load("/usr/share/fonts/X11/misc/ter-u22b_unicode.pil"),
+        )
 
 
-def _cached_font(cache_key, loader_func):
-    """Load font with caching."""
-    if cache_key not in _font_cache:
-        _font_cache[cache_key] = loader_func()
-    return _font_cache[cache_key]
-
-
-def ubuntu_regular(size):
-    """Ubuntu Regular font with specified size."""
-    return _cached_font(f"ubuntu_regular_{size}", 
-                       lambda: ImageFont.truetype("/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf", size))
-
-
-def terminus_bold_16():
-    """Terminus Bold 16pt font."""
-    return _cached_font("terminus_bold_16", 
-                       lambda: ImageFont.load('/usr/share/fonts/X11/misc/ter-u16b_unicode.pil'))
-
-
-def terminus_regular_12():
-    """Terminus Regular 12pt font."""
-    return _cached_font("terminus_regular_12", 
-                       lambda: ImageFont.load('/usr/share/fonts/X11/misc/ter-u12n_unicode.pil'))
-
-
-def terminus_bold_14():
-    """Terminus Bold 14pt font."""
-    return _cached_font("terminus_bold_14", 
-                       lambda: ImageFont.load('/usr/share/fonts/X11/misc/ter-u14b_unicode.pil'))
-
-
-def terminus_bold_22():
-    """Terminus Bold 22pt font."""
-    return _cached_font("terminus_bold_22", 
-                       lambda: ImageFont.load('/usr/share/fonts/X11/misc/ter-u22b_unicode.pil'))
+_default_font_loader = FontLoader()
+ubuntu_regular = _default_font_loader.ubuntu_regular
+terminus_bold_16 = _default_font_loader.terminus_bold_16
+terminus_regular_12 = _default_font_loader.terminus_regular_12
+terminus_bold_14 = _default_font_loader.terminus_bold_14
+terminus_bold_22 = _default_font_loader.terminus_bold_22
