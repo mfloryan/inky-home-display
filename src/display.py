@@ -30,6 +30,7 @@ class DrawProtocol(Protocol):
     def rectangle(self, xy, **kwargs): ...
     def textlength(self, text, **kwargs) -> float: ...
     def textbbox(self, xy, text, **kwargs) -> tuple[float, float, float, float]: ...
+    def point(self, xy, **kwargs): ...
 
 
 class TranslatedDraw:
@@ -62,6 +63,10 @@ class TranslatedDraw:
 
     def textbbox(self, xy, text, **kwargs):
         return self.draw.textbbox(xy, text, **kwargs)
+
+    def point(self, xy, **kwargs):
+        translated_xy = (xy[0] + self.offset_x, xy[1] + self.offset_y)
+        return self.draw.point(translated_xy, **kwargs)
 
 
 class Widget(ABC):
@@ -187,6 +192,68 @@ class FooterWidget(Widget):
         x = self.bounds.width - now_size[2]
         y = self.bounds.height - now_size[3]
         draw.text((x, y), now_text, font=font, fill=colours[1])
+
+
+class EnergyPriceGraphWidget(Widget):
+    def __init__(self, bounds: Rectangle, price_data: EnergyPriceData):
+        super().__init__(bounds)
+        self.price_data = price_data
+
+    def render(self, draw: DrawProtocol, colours: list) -> None:
+        draw.rectangle(
+            [0, 0, self.bounds.width, self.bounds.height], outline=colours[0]
+        )
+
+        hourly_price_max = max(self.price_data.day_hourly_prices)
+        self._draw_reference_lines(draw, colours, hourly_price_max)
+        self._draw_hourly_price_bars(draw, colours)
+
+    def _draw_reference_lines(
+        self, draw: DrawProtocol, colours: list, hourly_price_max: float
+    ) -> None:
+        dy = self.bounds.height - 2
+        if hourly_price_max > 1.0:
+            highest_full_sek = int(hourly_price_max)
+            one_sek_step = round(
+                ((highest_full_sek * dy) / hourly_price_max) / highest_full_sek
+            )
+
+            for y in range(highest_full_sek):
+                for x in range(1, self.bounds.width):
+                    if x % 2 == 0:
+                        draw.point(
+                            [x, self.bounds.height - (one_sek_step * (y + 1))],
+                            fill=colours[0],
+                        )
+
+    def _draw_hourly_price_bars(self, draw: DrawProtocol, colours: list) -> None:
+        dy = self.bounds.height - 2
+        dx = self.bounds.width
+        bar_width = round(dx / len(self.price_data.day_hourly_prices))
+        hourly_price_max = max(self.price_data.day_hourly_prices)
+        hourly_price_min = min(self.price_data.day_hourly_prices)
+        max_abs_price = max(abs(hourly_price_max), abs(hourly_price_min), 1.0)
+
+        for hour, hourly_price in enumerate(self.price_data.day_hourly_prices):
+            bar_left = (bar_width * hour) + 2
+            bar_right = (bar_width * (hour + 1)) - 2
+
+            if hourly_price >= 0:
+                bar_top = self.bounds.height - round(
+                    dy * (hourly_price / max_abs_price)
+                )
+                bar_bottom = self.bounds.height
+            else:
+                bar_top = 0
+                bar_bottom = round(dy * (abs(hourly_price) / max_abs_price))
+
+            if self.price_data.current_hour == hour:
+                draw.rectangle(
+                    [bar_left - 2, 1, bar_right + 2, self.bounds.height - 1],
+                    fill=colours[1],
+                )
+
+            draw.rectangle([bar_left, bar_top, bar_right, bar_bottom], fill=colours[0])
 
 
 def draw_energy_price_graph(draw, colours, day_hourly_prices, current_time):

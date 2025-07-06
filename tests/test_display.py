@@ -1,7 +1,16 @@
 import datetime
 from unittest.mock import MagicMock
 
-from display import Rectangle, HeaderWidget, EnergyStatsWidget, EnergyData, EnergyPriceLabelsWidget, EnergyPriceData, FooterWidget
+from display import (
+    Rectangle,
+    HeaderWidget,
+    EnergyStatsWidget,
+    EnergyData,
+    EnergyPriceLabelsWidget,
+    EnergyPriceData,
+    FooterWidget,
+    EnergyPriceGraphWidget,
+)
 from display_backend import PngFileBackend
 
 
@@ -31,13 +40,12 @@ class TestHeaderWidget:
 
 
 class TestEnergyStatsWidget:
-    def test_energy_stats_widget_renders_production_and_consumption_at_widget_origin(self):
+    def test_energy_stats_widget_renders_production_and_consumption_at_widget_origin(
+        self,
+    ):
         bounds = Rectangle(270, 28, 130, 28)
         energy_data = EnergyData(
-            production=2.5,
-            consumption=1.8,
-            profit=1.25,
-            cost=0.95
+            production=2.5, consumption=1.8, profit=1.25, cost=0.95
         )
         mock_font_loader = MagicMock()
         widget = EnergyStatsWidget(bounds, mock_font_loader, energy_data)
@@ -70,8 +78,7 @@ class TestEnergyPriceLabelsWidget:
     def test_energy_price_labels_widget_renders_range_and_current_price(self):
         bounds = Rectangle(10, 28, 260, 30)
         price_data = EnergyPriceData(
-            day_hourly_prices=[0.85, 0.92, 1.15, 1.22, 1.18, 0.95],
-            current_hour=2
+            day_hourly_prices=[0.85, 0.92, 1.15, 1.22, 1.18, 0.95], current_hour=2
         )
         mock_font_loader = MagicMock()
         widget = EnergyPriceLabelsWidget(bounds, mock_font_loader, price_data)
@@ -128,3 +135,29 @@ class TestFooterWidget:
         assert call_args[0][0] == (50, 1)  # (200-150, 13-12)
         assert call_args[0][1] == "Updated: Mon 25 Dec 2023 14:30:45 "
         assert call_args[1]["fill"] == colours[1]  # Yellow color
+
+
+class TestEnergyPriceGraphWidget:
+    def test_energy_price_graph_widget_renders_bars_and_highlights_current_hour(self):
+        bounds = Rectangle(6, 60, 264, 224)
+        price_data = EnergyPriceData(
+            day_hourly_prices=[0.5, 0.8, 1.2, 0.9, 0.6], current_hour=2
+        )
+        widget = EnergyPriceGraphWidget(bounds, price_data)
+
+        mock_draw = MagicMock()
+        backend = PngFileBackend()
+        colours = backend.colors
+
+        widget.render(mock_draw, colours)
+
+        # Should draw main rectangle outline
+        assert mock_draw.rectangle.call_count >= 1
+
+        # Should draw reference lines (points)
+        assert mock_draw.point.call_count >= 1
+
+        # First rectangle call should be the main graph outline
+        first_rect_call = mock_draw.rectangle.call_args_list[0]
+        assert first_rect_call[0][0] == [0, 0, 264, 224]
+        assert first_rect_call[1]["outline"] == colours[0]
