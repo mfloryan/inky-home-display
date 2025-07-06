@@ -29,7 +29,7 @@ class DrawProtocol(Protocol):
     def text(self, xy, text, **kwargs): ...
     def rectangle(self, xy, **kwargs): ...
     def textlength(self, text, **kwargs) -> float: ...
-    def textbbox(self, xy, text, **kwargs): ...
+    def textbbox(self, xy, text, **kwargs) -> tuple[float, float, float, float]: ...
 
 
 class TranslatedDraw:
@@ -61,8 +61,7 @@ class TranslatedDraw:
         return self.draw.textlength(text, **kwargs)
 
     def textbbox(self, xy, text, **kwargs):
-        translated_xy = (xy[0] + self.offset_x, xy[1] + self.offset_y)
-        return self.draw.textbbox(translated_xy, text, **kwargs)
+        return self.draw.textbbox(xy, text, **kwargs)
 
 
 class Widget(ABC):
@@ -348,13 +347,13 @@ def generate_content(draw, data, colours):
     if data["weather"]:
         draw_weather(draw, colours, data["weather"], font_loader)
 
-    locale.setlocale(locale.LC_ALL, "en_GB.utf8")
-    font = font_loader.terminus_regular_12()
-    now_text = "Updated: " + data["current_time"].strftime("%c")
-    now_size = draw.textbbox((0, 0), now_text, font=font)
-    draw.text(
-        (400 - now_size[2], 300 - now_size[3]), now_text, font=font, fill=colours[1]
+    footer_widget = FooterWidget(
+        Rectangle(200, 287, 200, 13), font_loader, data["current_time"]
     )
+    translated_draw = TranslatedDraw(
+        draw, footer_widget.bounds.x, footer_widget.bounds.y
+    )
+    footer_widget.render(translated_draw, colours)
 
 
 def display(data, prefer_inky=True, png_output_path="img/test.png"):
