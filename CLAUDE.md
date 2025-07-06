@@ -50,6 +50,45 @@ The application targets a 3-color e-ink display (black, yellow, white) with spec
 - Weather forecast with temperature and conditions
 - Timestamp showing last update
 
+## NEXT SESSION TODO: Widget Architecture Improvement
+
+### Current Issue
+Widgets currently mix data selection/preparation logic with pure rendering. This violates separation of concerns.
+
+### Current Pattern (problematic):
+```python
+# Widget does both data selection AND rendering
+EnergyStatsWidget(bounds, font_loader, full_energy_stats_dict)
+# Inside widget: extract production, consumption, profit, cost from dict
+```
+
+### Proposed Pattern (better):
+```python
+# Separate data preparation from rendering
+stats_view = EnergyStatsViewData(production=2.5, consumption=1.8, profit=1.25, cost=0.95)
+EnergyStatsWidget(bounds, font_loader, stats_view)
+# Widget only renders the exact data it needs
+```
+
+### Implementation Steps:
+1. **Create ViewData classes** - Simple dataclasses with exactly the data each widget needs
+2. **Extract data preparation logic** - Move from widgets to dedicated functions/classes
+3. **Refactor widgets** - Make them pure rendering functions
+4. **Update tests** - Test data preparation separately from rendering
+5. **Clean up duplicate data structures** - EnergyGraphData and EnergyPriceData are identical
+
+### Benefits:
+- **Pure widgets** - Only rendering, easier to test
+- **Reusable data preparation** - ViewData creation can be tested independently
+- **Clear separation** - Data logic vs display logic
+- **Better naming** - ViewData classes express intent clearly
+
+### Examples to refactor:
+- EnergyStatsWidget: needs `production`, `consumption`, `profit`, `cost` numbers only
+- EnergyPriceLabelsWidget: needs price array + current hour
+- HeaderWidget: needs just datetime
+- FooterWidget: needs just datetime
+
 ## Testing Principles
 
 ### Behavior-Driven Testing
