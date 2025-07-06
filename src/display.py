@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Protocol
 from PIL import ImageDraw
 from display_backend import create_backend
-from fonts import FontLoader, terminus_bold_16, terminus_regular_12, terminus_bold_14, terminus_bold_22, ubuntu_regular
+from fonts import FontLoader
 
 
 @dataclass
@@ -50,7 +50,12 @@ class Widget(ABC):
 
 
 class HeaderWidget(Widget):
-    def __init__(self, bounds: Rectangle, font_loader: FontLoader, current_time: datetime.datetime):
+    def __init__(
+        self,
+        bounds: Rectangle,
+        font_loader: FontLoader,
+        current_time: datetime.datetime,
+    ):
         super().__init__(bounds)
         self.font_loader = font_loader
         self.current_time = current_time
@@ -77,7 +82,9 @@ class EnergyPriceData:
 
 
 class EnergyStatsWidget(Widget):
-    def __init__(self, bounds: Rectangle, font_loader: FontLoader, energy_data: EnergyData):
+    def __init__(
+        self, bounds: Rectangle, font_loader: FontLoader, energy_data: EnergyData
+    ):
         super().__init__(bounds)
         self.font_loader = font_loader
         self.energy_data = energy_data
@@ -92,7 +99,9 @@ class EnergyStatsWidget(Widget):
 
 
 class EnergyPriceLabelsWidget(Widget):
-    def __init__(self, bounds: Rectangle, font_loader: FontLoader, price_data: EnergyPriceData):
+    def __init__(
+        self, bounds: Rectangle, font_loader: FontLoader, price_data: EnergyPriceData
+    ):
         super().__init__(bounds)
         self.font_loader = font_loader
         self.price_data = price_data
@@ -134,7 +143,9 @@ class EnergyPriceLabelsWidget(Widget):
         )
 
 
-def draw_energy_price_graph(draw, colours, day_hourly_prices, current_time):
+def draw_energy_price_graph(
+    draw, colours, day_hourly_prices, current_time, font_loader
+):
     min_dim = {"x": 6, "y": 60}
     max_dim = {"x": 270, "y": 284}
     draw.rectangle(
@@ -155,6 +166,7 @@ def draw_energy_price_graph(draw, colours, day_hourly_prices, current_time):
         hourly_price_min,
         hourly_price_max,
         current_time,
+        font_loader,
     )
 
 
@@ -205,10 +217,16 @@ def _draw_hourly_price_bars(
 
 
 def _draw_price_labels(
-    draw, colours, day_hourly_prices, hourly_price_min, hourly_price_max, current_time
+    draw,
+    colours,
+    day_hourly_prices,
+    hourly_price_min,
+    hourly_price_max,
+    current_time,
+    font_loader,
 ):
-    font_bold = terminus_bold_16()
-    font = terminus_regular_12()
+    font_bold = font_loader.terminus_bold_16()
+    font = font_loader.terminus_regular_12()
 
     price_range_text = (
         f"{round(hourly_price_min, 2)} -- {round(hourly_price_max, 2)} SEK"
@@ -240,11 +258,11 @@ def _draw_price_labels(
     )
 
 
-def draw_weather(draw, colours, data):
-    font_sun = terminus_regular_12()
-    font_header = terminus_bold_14()
-    font_temp = terminus_bold_22()
-    font_label = ubuntu_regular(12)
+def draw_weather(draw, colours, data, font_loader):
+    font_sun = font_loader.terminus_regular_12()
+    font_header = font_loader.terminus_bold_14()
+    font_temp = font_loader.terminus_bold_22()
+    font_label = font_loader.ubuntu_regular(12)
     temperature_right = 390
 
     def draw_single_forecast(forecast, y):
@@ -291,8 +309,10 @@ def draw_weather(draw, colours, data):
 
 def generate_content(draw, data, colours):
     font_loader = FontLoader()
-    
-    header_widget = HeaderWidget(Rectangle(4, 0, 396, 25), font_loader, data["current_time"])
+
+    header_widget = HeaderWidget(
+        Rectangle(4, 0, 396, 25), font_loader, data["current_time"]
+    )
     translated_draw = TranslatedDraw(
         draw, header_widget.bounds.x, header_widget.bounds.y
     )
@@ -302,7 +322,7 @@ def generate_content(draw, data, colours):
 
     if data["energy_prices"]:
         draw_energy_price_graph(
-            draw, colours, data["energy_prices"], data["current_time"]
+            draw, colours, data["energy_prices"], data["current_time"], font_loader
         )
 
     if data["energy_stats"]:
@@ -321,10 +341,10 @@ def generate_content(draw, data, colours):
         energy_stats_widget.render(translated_draw, colours)
 
     if data["weather"]:
-        draw_weather(draw, colours, data["weather"])
+        draw_weather(draw, colours, data["weather"], font_loader)
 
     locale.setlocale(locale.LC_ALL, "en_GB.utf8")
-    font = terminus_regular_12()
+    font = font_loader.terminus_regular_12()
     now_text = "Updated: " + data["current_time"].strftime("%c")
     now_size = draw.textbbox((0, 0), now_text, font=font)
     draw.text(

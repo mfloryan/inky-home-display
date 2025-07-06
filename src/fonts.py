@@ -41,11 +41,3 @@ class FontLoader:
             "terminus_bold_22",
             lambda: ImageFont.load("/usr/share/fonts/X11/misc/ter-u22b_unicode.pil"),
         )
-
-
-_default_font_loader = FontLoader()
-ubuntu_regular = _default_font_loader.ubuntu_regular
-terminus_bold_16 = _default_font_loader.terminus_bold_16
-terminus_regular_12 = _default_font_loader.terminus_regular_12
-terminus_bold_14 = _default_font_loader.terminus_bold_14
-terminus_bold_22 = _default_font_loader.terminus_bold_22
