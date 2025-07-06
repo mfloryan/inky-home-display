@@ -1,7 +1,7 @@
 import datetime
 from unittest.mock import MagicMock
 
-from display import Rectangle, HeaderWidget, EnergyStatsWidget, EnergyData, EnergyPriceLabelsWidget, EnergyPriceData
+from display import Rectangle, HeaderWidget, EnergyStatsWidget, EnergyData, EnergyPriceLabelsWidget, EnergyPriceData, FooterWidget
 from display_backend import PngFileBackend
 
 
@@ -104,3 +104,27 @@ class TestEnergyPriceLabelsWidget:
         assert current_call[0][0] == (0, 14)
         assert "now: 1.15 SEK" == current_call[0][1]
         assert current_call[1]["fill"] == colours[0]
+
+
+class TestFooterWidget:
+    def test_footer_widget_renders_update_timestamp_at_bottom_right(self):
+        bounds = Rectangle(200, 287, 200, 13)
+        current_time = datetime.datetime(2023, 12, 25, 14, 30, 45)
+        mock_font_loader = MagicMock()
+        mock_font_loader.terminus_regular_12.return_value = "mock_font"
+        widget = FooterWidget(bounds, mock_font_loader, current_time)
+
+        mock_draw = MagicMock()
+        mock_draw.textbbox.return_value = (0, 0, 150, 12)
+        backend = PngFileBackend()
+        colours = backend.colors
+
+        widget.render(mock_draw, colours)
+
+        mock_draw.text.assert_called_once()
+        call_args = mock_draw.text.call_args
+
+        # Should calculate position to right-align text
+        assert call_args[0][0] == (50, 1)  # (200-150, 13-12)
+        assert call_args[0][1] == "Updated: Mon 25 Dec 2023 14:30:45 "
+        assert call_args[1]["fill"] == colours[1]  # Yellow color

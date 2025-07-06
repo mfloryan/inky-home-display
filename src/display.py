@@ -29,6 +29,7 @@ class DrawProtocol(Protocol):
     def text(self, xy, text, **kwargs): ...
     def rectangle(self, xy, **kwargs): ...
     def textlength(self, text, **kwargs) -> float: ...
+    def textbbox(self, xy, text, **kwargs): ...
 
 
 class TranslatedDraw:
@@ -58,6 +59,10 @@ class TranslatedDraw:
 
     def textlength(self, text, **kwargs):
         return self.draw.textlength(text, **kwargs)
+
+    def textbbox(self, xy, text, **kwargs):
+        translated_xy = (xy[0] + self.offset_x, xy[1] + self.offset_y)
+        return self.draw.textbbox(translated_xy, text, **kwargs)
 
 
 class Widget(ABC):
@@ -163,9 +168,29 @@ class EnergyPriceLabelsWidget(Widget):
         )
 
 
-def draw_energy_price_graph(
-    draw, colours, day_hourly_prices, current_time, font_loader
-):
+class FooterWidget(Widget):
+    def __init__(
+        self,
+        bounds: Rectangle,
+        font_loader: FontLoader,
+        current_time: datetime.datetime,
+    ):
+        super().__init__(bounds)
+        self.font_loader = font_loader
+        self.current_time = current_time
+
+    def render(self, draw: DrawProtocol, colours: list) -> None:
+        locale.setlocale(locale.LC_ALL, "en_GB.utf8")
+        font = self.font_loader.terminus_regular_12()
+        now_text = "Updated: " + self.current_time.strftime("%c")
+        now_size = draw.textbbox((0, 0), now_text, font=font)
+
+        x = self.bounds.width - now_size[2]
+        y = self.bounds.height - now_size[3]
+        draw.text((x, y), now_text, font=font, fill=colours[1])
+
+
+def draw_energy_price_graph(draw, colours, day_hourly_prices, current_time):
     min_dim = {"x": 6, "y": 60}
     max_dim = {"x": 270, "y": 284}
     draw.rectangle(
@@ -173,7 +198,6 @@ def draw_energy_price_graph(
     )
 
     hourly_price_max = max(day_hourly_prices)
-    hourly_price_min = min(day_hourly_prices)
 
     _draw_price_reference_lines(draw, colours, hourly_price_max, min_dim, max_dim)
     _draw_hourly_price_bars(
@@ -225,8 +249,6 @@ def _draw_hourly_price_bars(
             )
 
         draw.rectangle([bar_left, bar_top, bar_right, bar_bottom], fill=colours[0])
-
-
 
 
 def draw_weather(draw, colours, data, font_loader):
@@ -293,12 +315,12 @@ def generate_content(draw, data, colours):
 
     if data["energy_prices"]:
         draw_energy_price_graph(
-            draw, colours, data["energy_prices"], data["current_time"], font_loader
+            draw, colours, data["energy_prices"], data["current_time"]
         )
 
         price_data = EnergyPriceData(
             day_hourly_prices=data["energy_prices"],
-            current_hour=data["current_time"].hour
+            current_hour=data["current_time"].hour,
         )
         price_labels_widget = EnergyPriceLabelsWidget(
             Rectangle(10, 28, 260, 30), font_loader, price_data
