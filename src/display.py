@@ -179,15 +179,6 @@ def draw_energy_price_graph(
     _draw_hourly_price_bars(
         draw, colours, day_hourly_prices, min_dim, max_dim, current_time
     )
-    _draw_price_labels(
-        draw,
-        colours,
-        day_hourly_prices,
-        hourly_price_min,
-        hourly_price_max,
-        current_time,
-        font_loader,
-    )
 
 
 def _draw_price_reference_lines(draw, colours, hourly_price_max, min_dim, max_dim):
@@ -236,46 +227,6 @@ def _draw_hourly_price_bars(
         draw.rectangle([bar_left, bar_top, bar_right, bar_bottom], fill=colours[0])
 
 
-def _draw_price_labels(
-    draw,
-    colours,
-    day_hourly_prices,
-    hourly_price_min,
-    hourly_price_max,
-    current_time,
-    font_loader,
-):
-    font_bold = font_loader.terminus_bold_16()
-    font = font_loader.terminus_regular_12()
-
-    price_range_text = (
-        f"{round(hourly_price_min, 2)} -- {round(hourly_price_max, 2)} SEK"
-    )
-    draw.text((10, 28), price_range_text, font=font, fill=colours[0])
-
-    now_price_baseline = 42
-    now_price_left = 10
-    now_price_text = f"now: {round(day_hourly_prices[current_time.hour], 2)} SEK"
-    draw.rectangle(
-        [
-            (now_price_left - 2, now_price_baseline - 1),
-            (
-                now_price_left
-                - 2
-                + draw.textlength(now_price_text, font=font_bold)
-                + 2,
-                now_price_baseline + 13,
-            ),
-        ],
-        outline=colours[1],
-        width=1,
-    )
-    draw.text(
-        (now_price_left, now_price_baseline),
-        now_price_text,
-        font=font_bold,
-        fill=colours[0],
-    )
 
 
 def draw_weather(draw, colours, data, font_loader):
@@ -344,6 +295,18 @@ def generate_content(draw, data, colours):
         draw_energy_price_graph(
             draw, colours, data["energy_prices"], data["current_time"], font_loader
         )
+
+        price_data = EnergyPriceData(
+            day_hourly_prices=data["energy_prices"],
+            current_hour=data["current_time"].hour
+        )
+        price_labels_widget = EnergyPriceLabelsWidget(
+            Rectangle(10, 28, 260, 30), font_loader, price_data
+        )
+        translated_draw = TranslatedDraw(
+            draw, price_labels_widget.bounds.x, price_labels_widget.bounds.y
+        )
+        price_labels_widget.render(translated_draw, colours)
 
     if data["energy_stats"]:
         energy_data = EnergyData(
