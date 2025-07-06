@@ -3,7 +3,6 @@ from unittest.mock import MagicMock
 
 from display import Rectangle, HeaderWidget, EnergyStatsWidget, EnergyData, EnergyPriceLabelsWidget, EnergyPriceData
 from display_backend import PngFileBackend
-from fonts import FontLoader
 
 
 class TestHeaderWidget:

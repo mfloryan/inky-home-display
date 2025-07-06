@@ -27,6 +27,8 @@ class Rectangle:
 
 class DrawProtocol(Protocol):
     def text(self, xy, text, **kwargs): ...
+    def rectangle(self, xy, **kwargs): ...
+    def textlength(self, text, **kwargs) -> float: ...
 
 
 class TranslatedDraw:
@@ -38,6 +40,24 @@ class TranslatedDraw:
     def text(self, xy, text, **kwargs):
         translated_xy = (xy[0] + self.offset_x, xy[1] + self.offset_y)
         return self.draw.text(translated_xy, text, **kwargs)
+
+    def rectangle(self, xy, **kwargs):
+        if len(xy) == 4:
+            translated_xy = [
+                xy[0] + self.offset_x,
+                xy[1] + self.offset_y,
+                xy[2] + self.offset_x,
+                xy[3] + self.offset_y,
+            ]
+        else:
+            translated_xy = [
+                (xy[0][0] + self.offset_x, xy[0][1] + self.offset_y),
+                (xy[1][0] + self.offset_x, xy[1][1] + self.offset_y),
+            ]
+        return self.draw.rectangle(translated_xy, **kwargs)
+
+    def textlength(self, text, **kwargs):
+        return self.draw.textlength(text, **kwargs)
 
 
 class Widget(ABC):
