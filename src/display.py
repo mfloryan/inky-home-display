@@ -30,6 +30,7 @@ class DrawProtocol(Protocol):
     def textlength(self, text, **kwargs) -> float: ...
     def textbbox(self, xy, text, **kwargs) -> tuple[float, float, float, float]: ...
     def point(self, xy, **kwargs): ...
+    def ellipse(self, xy, **kwargs): ...
 
 
 class TranslatedDraw:
@@ -66,6 +67,21 @@ class TranslatedDraw:
     def point(self, xy, **kwargs):
         translated_xy = (xy[0] + self.offset_x, xy[1] + self.offset_y)
         return self.draw.point(translated_xy, **kwargs)
+
+    def ellipse(self, xy, **kwargs):
+        if len(xy) == 4:
+            translated_xy = [
+                xy[0] + self.offset_x,
+                xy[1] + self.offset_y,
+                xy[2] + self.offset_x,
+                xy[3] + self.offset_y,
+            ]
+        else:
+            translated_xy = [
+                (xy[0][0] + self.offset_x, xy[0][1] + self.offset_y),
+                (xy[1][0] + self.offset_x, xy[1][1] + self.offset_y),
+            ]
+        return self.draw.ellipse(translated_xy, **kwargs)
 
 
 class Widget(ABC):
@@ -311,54 +327,6 @@ class WeatherWidget(Widget):
             forecast_y = draw_single_forecast(forecast, forecast_y)
 
 
-def draw_weather(draw, colours, data, font_loader):
-    font_sun = font_loader.terminus_regular_12()
-    font_header = font_loader.terminus_bold_14()
-    font_temp = font_loader.terminus_bold_22()
-    font_label = font_loader.ubuntu_regular(12)
-    temperature_right = 390
-
-    def draw_single_forecast(forecast, y):
-        draw.text(
-            (280, y),
-            forecast["time"].strftime("%H:%M"),
-            font=font_header,
-            fill=colours[0],
-        )
-        temp_text = f"{round(forecast['temp'])}°C"
-        draw.text(
-            (temperature_right - draw.textlength(temp_text, font=font_temp), y - 6),
-            temp_text,
-            font=font_temp,
-            fill=colours[0],
-        )
-        y += 12
-        draw.text((280, y), forecast["weather"], font=font_label, fill=colours[0])
-        y += 26
-        return y
-
-    draw.text((300, 6), "POGODA", font=font_header, fill=colours[1])
-    draw.text((300, 20), data["name"], font=font_label, fill=colours[0])
-    draw.ellipse([(286, 36), (297, 47)], fill=colours[1])
-    draw.text(
-        (300, 36),
-        f"{data['sunrise'].strftime('%H:%M')}-{data['sunset'].strftime('%H:%M')}",
-        font=font_sun,
-        fill=colours[0],
-    )
-    temp_text = f"{round(data['now']['temp'], 1)}°C"
-    draw.text(
-        (temperature_right - draw.textlength(temp_text, font=font_temp), 50),
-        temp_text,
-        font=font_temp,
-        fill=colours[0],
-    )
-    draw.text((280, 55), "teraz:", font=font_label, fill=colours[1])
-
-    forecast_y = 86
-    for forecast in data["forecast"][:4]:
-        forecast_y = draw_single_forecast(forecast, forecast_y)
-
 
 def generate_content(draw, data, colours):
     font_loader = FontLoader()
@@ -411,7 +379,13 @@ def generate_content(draw, data, colours):
         energy_stats_widget.render(translated_draw, colours)
 
     if data["weather"]:
-        draw_weather(draw, colours, data["weather"], font_loader)
+        weather_widget = WeatherWidget(
+            Rectangle(280, 6, 120, 200), font_loader, data["weather"]
+        )
+        translated_draw = TranslatedDraw(
+            draw, weather_widget.bounds.x, weather_widget.bounds.y
+        )
+        weather_widget.render(translated_draw, colours)
 
     footer_widget = FooterWidget(
         Rectangle(200, 287, 200, 13), font_loader, data["current_time"]
