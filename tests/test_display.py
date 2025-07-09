@@ -10,6 +10,7 @@ from display import (
     EnergyPriceData,
     FooterWidget,
     EnergyPriceGraphWidget,
+    WeatherWidget,
 )
 from display_backend import PngFileBackend
 
@@ -135,6 +136,42 @@ class TestFooterWidget:
         assert call_args[0][0] == (50, 1)  # (200-150, 13-12)
         assert call_args[0][1] == "Updated: Mon 25 Dec 2023 14:30:45 "
         assert call_args[1]["fill"] == colours[1]  # Yellow color
+
+
+class TestWeatherWidget:
+    def test_weather_widget_renders_location_and_current_temperature_at_widget_origin(self):
+        bounds = Rectangle(280, 6, 120, 200)
+        weather_data = {
+            "name": "Stockholm",
+            "sunrise": datetime.datetime(2023, 12, 25, 8, 30),
+            "sunset": datetime.datetime(2023, 12, 25, 15, 45),
+            "now": {"temp": 2.5},
+            "forecast": [
+                {"time": datetime.datetime(2023, 12, 25, 18, 0), "temp": 1, "weather": "pochmurno"},
+                {"time": datetime.datetime(2023, 12, 25, 21, 0), "temp": -1, "weather": "śnieg"},
+            ]
+        }
+        mock_font_loader = MagicMock()
+        widget = WeatherWidget(bounds, mock_font_loader, weather_data)
+
+        mock_draw = MagicMock()
+        backend = PngFileBackend()
+        colours = backend.colors
+
+        widget.render(mock_draw, colours)
+
+        # Should render header "POGODA" at (20, 0) relative to widget origin
+        text_calls = mock_draw.text.call_args_list
+        pogoda_call = text_calls[0]
+        assert pogoda_call[0][0] == (20, 0)
+        assert pogoda_call[0][1] == "POGODA"
+        assert pogoda_call[1]["fill"] == colours[1]
+
+        # Should render location name at (20, 14)
+        location_call = text_calls[1]
+        assert location_call[0][0] == (20, 14)
+        assert location_call[0][1] == "Stockholm"
+        assert location_call[1]["fill"] == colours[0]
 
 
 class TestEnergyPriceGraphWidget:
