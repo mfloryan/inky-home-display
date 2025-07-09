@@ -256,67 +256,6 @@ class EnergyPriceGraphWidget(Widget):
             draw.rectangle([bar_left, bar_top, bar_right, bar_bottom], fill=colours[0])
 
 
-def draw_energy_price_graph(draw, colours, day_hourly_prices, current_time):
-    min_dim = {"x": 6, "y": 60}
-    max_dim = {"x": 270, "y": 284}
-    draw.rectangle(
-        [min_dim["x"], min_dim["y"], max_dim["x"], max_dim["y"]], outline=colours[0]
-    )
-
-    hourly_price_max = max(day_hourly_prices)
-
-    _draw_price_reference_lines(draw, colours, hourly_price_max, min_dim, max_dim)
-    _draw_hourly_price_bars(
-        draw, colours, day_hourly_prices, min_dim, max_dim, current_time
-    )
-
-
-def _draw_price_reference_lines(draw, colours, hourly_price_max, min_dim, max_dim):
-    dy = max_dim["y"] - min_dim["y"] - 2
-    if hourly_price_max > 1.0:
-        highest_full_sek = math.floor(hourly_price_max)
-        one_sek_step = round(
-            ((highest_full_sek * dy) / hourly_price_max) / highest_full_sek
-        )
-
-        for y in range(highest_full_sek):
-            for x in range(min_dim["x"] + 1, max_dim["x"]):
-                if x % 2 == 0:
-                    draw.point(
-                        [x, max_dim["y"] - (one_sek_step * (y + 1))], fill=colours[0]
-                    )
-
-
-def _draw_hourly_price_bars(
-    draw, colours, day_hourly_prices, min_dim, max_dim, current_time
-):
-    dy = max_dim["y"] - min_dim["y"] - 2
-    dx = max_dim["x"] - min_dim["x"]
-    bar_width = round(dx / len(day_hourly_prices))
-    hourly_price_max = max(day_hourly_prices)
-    hourly_price_min = min(day_hourly_prices)
-    max_abs_price = max(abs(hourly_price_max), abs(hourly_price_min), 1.0)
-
-    for hour, hourly_price in enumerate(day_hourly_prices):
-        bar_left = (bar_width * hour + min_dim["x"]) + 2
-        bar_right = (bar_width * (hour + 1) + min_dim["x"]) - 2
-
-        if hourly_price >= 0:
-            bar_top = max_dim["y"] - round(dy * (hourly_price / max_abs_price))
-            bar_bottom = max_dim["y"]
-        else:
-            bar_top = min_dim["y"]
-            bar_bottom = min_dim["y"] + round(dy * (abs(hourly_price) / max_abs_price))
-
-        if current_time.hour == hour:
-            draw.rectangle(
-                [bar_left - 2, min_dim["y"] + 1, bar_right + 2, max_dim["y"] - 1],
-                fill=colours[1],
-            )
-
-        draw.rectangle([bar_left, bar_top, bar_right, bar_bottom], fill=colours[0])
-
-
 def draw_weather(draw, colours, data, font_loader):
     font_sun = font_loader.terminus_regular_12()
     font_header = font_loader.terminus_bold_14()
@@ -380,14 +319,19 @@ def generate_content(draw, data, colours):
     locale.setlocale(locale.LC_ALL, "pl_PL.utf8")
 
     if data["energy_prices"]:
-        draw_energy_price_graph(
-            draw, colours, data["energy_prices"], data["current_time"]
-        )
-
         price_data = EnergyPriceData(
             day_hourly_prices=data["energy_prices"],
             current_hour=data["current_time"].hour,
         )
+
+        energy_price_graph_widget = EnergyPriceGraphWidget(
+            Rectangle(6, 60, 264, 224), price_data
+        )
+        translated_draw = TranslatedDraw(
+            draw, energy_price_graph_widget.bounds.x, energy_price_graph_widget.bounds.y
+        )
+        energy_price_graph_widget.render(translated_draw, colours)
+
         price_labels_widget = EnergyPriceLabelsWidget(
             Rectangle(10, 28, 260, 30), font_loader, price_data
         )
