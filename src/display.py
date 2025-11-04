@@ -121,8 +121,8 @@ class EnergyData:
 
 @dataclass
 class EnergyPriceData:
-    day_hourly_prices: list[float]
-    current_hour: int
+    day_prices: list[float]
+    current_quarter: int
 
 
 class EnergyStatsWidget(Widget):
@@ -151,20 +151,18 @@ class EnergyPriceLabelsWidget(Widget):
         self.price_data = price_data
 
     def render(self, draw: DrawProtocol, colours: list) -> None:
-        hourly_price_max = max(self.price_data.day_hourly_prices)
-        hourly_price_min = min(self.price_data.day_hourly_prices)
+        price_max = max(self.price_data.day_prices)
+        price_min = min(self.price_data.day_prices)
 
         font_bold = self.font_loader.terminus_bold_16()
         font = self.font_loader.terminus_regular_12()
 
-        price_range_text = (
-            f"{round(hourly_price_min, 2)} -- {round(hourly_price_max, 2)} SEK"
-        )
+        price_range_text = f"{round(price_min, 2)} -- {round(price_max, 2)} SEK"
         draw.text((0, 0), price_range_text, font=font, fill=colours[0])
 
         now_price_baseline = 14
         now_price_left = 0
-        now_price_text = f"now: {round(self.price_data.day_hourly_prices[self.price_data.current_hour], 2)} SEK"
+        now_price_text = f"now: {round(self.price_data.day_prices[self.price_data.current_quarter], 2)} SEK"
         draw.rectangle(
             [
                 (now_price_left - 2, now_price_baseline - 1),
@@ -219,18 +217,18 @@ class EnergyPriceGraphWidget(Widget):
             [0, 0, self.bounds.width, self.bounds.height], outline=colours[0]
         )
 
-        hourly_price_max = max(self.price_data.day_hourly_prices)
-        self._draw_reference_lines(draw, colours, hourly_price_max)
-        self._draw_hourly_price_bars(draw, colours)
+        price_max = max(self.price_data.day_prices)
+        self._draw_reference_lines(draw, colours, price_max)
+        self._draw_price_bars(draw, colours)
 
     def _draw_reference_lines(
-        self, draw: DrawProtocol, colours: list, hourly_price_max: float
+        self, draw: DrawProtocol, colours: list, price_max: float
     ) -> None:
         dy = self.bounds.height - 2
-        if hourly_price_max > 1.0:
-            highest_full_sek = int(hourly_price_max)
+        if price_max > 1.0:
+            highest_full_sek = int(price_max)
             one_sek_step = round(
-                ((highest_full_sek * dy) / hourly_price_max) / highest_full_sek
+                ((highest_full_sek * dy) / price_max) / highest_full_sek
             )
 
             for y in range(highest_full_sek):
@@ -241,30 +239,28 @@ class EnergyPriceGraphWidget(Widget):
                             fill=colours[0],
                         )
 
-    def _draw_hourly_price_bars(self, draw: DrawProtocol, colours: list) -> None:
+    def _draw_price_bars(self, draw: DrawProtocol, colours: list) -> None:
         dy = self.bounds.height - 2
-        dx = self.bounds.width
-        bar_width = round(dx / len(self.price_data.day_hourly_prices))
-        hourly_price_max = max(self.price_data.day_hourly_prices)
-        hourly_price_min = min(self.price_data.day_hourly_prices)
-        max_abs_price = max(abs(hourly_price_max), abs(hourly_price_min), 1.0)
+        bar_width = 1
+        bar_spacing = 1
+        price_max = max(self.price_data.day_prices)
+        price_min = min(self.price_data.day_prices)
+        max_abs_price = max(abs(price_max), abs(price_min), 1.0)
 
-        for hour, hourly_price in enumerate(self.price_data.day_hourly_prices):
-            bar_left = (bar_width * hour) + 2
-            bar_right = (bar_width * (hour + 1)) - 2
+        for index, price in enumerate(self.price_data.day_prices):
+            bar_left = (bar_width + bar_spacing) * (index + 1)
+            bar_right = bar_left + bar_width - 1
 
-            if hourly_price >= 0:
-                bar_top = self.bounds.height - round(
-                    dy * (hourly_price / max_abs_price)
-                )
+            if price >= 0:
+                bar_top = self.bounds.height - round(dy * (price / max_abs_price))
                 bar_bottom = self.bounds.height
             else:
                 bar_top = 0
-                bar_bottom = round(dy * (abs(hourly_price) / max_abs_price))
+                bar_bottom = round(dy * (abs(price) / max_abs_price))
 
-            if self.price_data.current_hour == hour:
+            if self.price_data.current_quarter == index:
                 draw.rectangle(
-                    [bar_left - 2, 1, bar_right + 2, self.bounds.height - 1],
+                    [bar_left - 1, 1, bar_right + 1, self.bounds.height - 1],
                     fill=colours[1],
                 )
 
@@ -327,7 +323,6 @@ class WeatherWidget(Widget):
             forecast_y = draw_single_forecast(forecast, forecast_y)
 
 
-
 def generate_content(draw, data, colours):
     font_loader = FontLoader()
 
@@ -343,12 +338,17 @@ def generate_content(draw, data, colours):
 
     if data["energy_prices"]:
         price_data = EnergyPriceData(
-            day_hourly_prices=data["energy_prices"],
-            current_hour=data["current_time"].hour,
+            day_prices=data["energy_prices"],
+            current_quarter=(data["current_time"].hour * 4)
+            + (data["current_time"].minute // 15),
         )
 
+        num_bars = len(data["energy_prices"])
+        bar_width = 1
+        bar_spacing = 1
+        graph_width = (num_bars * (bar_width + bar_spacing)) + 2
         energy_price_graph_widget = EnergyPriceGraphWidget(
-            Rectangle(6, 60, 264, 224), price_data
+            Rectangle(6, 60, graph_width, 200), price_data
         )
         translated_draw = TranslatedDraw(
             draw, energy_price_graph_widget.bounds.x, energy_price_graph_widget.bounds.y

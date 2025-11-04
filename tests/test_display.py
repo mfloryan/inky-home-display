@@ -79,7 +79,7 @@ class TestEnergyPriceLabelsWidget:
     def test_energy_price_labels_widget_renders_range_and_current_price(self):
         bounds = Rectangle(10, 28, 260, 30)
         price_data = EnergyPriceData(
-            day_hourly_prices=[0.85, 0.92, 1.15, 1.22, 1.18, 0.95], current_hour=2
+            day_prices=[0.85, 0.92, 1.15, 1.22, 1.18, 0.95], current_quarter=2
         )
         mock_font_loader = MagicMock()
         widget = EnergyPriceLabelsWidget(bounds, mock_font_loader, price_data)
@@ -178,7 +178,7 @@ class TestEnergyPriceGraphWidget:
     def test_energy_price_graph_widget_renders_bars_and_highlights_current_hour(self):
         bounds = Rectangle(6, 60, 264, 224)
         price_data = EnergyPriceData(
-            day_hourly_prices=[0.5, 0.8, 1.2, 0.9, 0.6], current_hour=2
+            day_prices=[0.5, 0.8, 1.2, 0.9, 0.6], current_quarter=2
         )
         widget = EnergyPriceGraphWidget(bounds, price_data)
 

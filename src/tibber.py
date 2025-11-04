@@ -22,7 +22,7 @@ def load_token():
 
 def load_prices_from_tibber():
     query = (
-        "{ viewer { homes { currentSubscription { priceInfo{today {total startsAt}}}}}}"
+        "{ viewer { homes { currentSubscription { priceInfo(resolution:QUARTER_HOURLY){today {total startsAt}}}}}}"
     )
 
     response_json = load_data_from_tibber(load_token(), query)
@@ -55,7 +55,6 @@ def load_day_stats_from_tibber():
             if n["profit"]:
                 stats["profit"] += n["profit"]
 
-    consumption = {"consumption": 0, "cost": 0}
     for n in data["consumption"]["nodes"]:
         if today(datetime.fromisoformat(n["from"])):
             if n["consumption"]:
