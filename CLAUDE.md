@@ -50,44 +50,37 @@ The application targets a 3-color e-ink display (black, yellow, white) with spec
 - Weather forecast with temperature and conditions
 - Timestamp showing last update
 
-## NEXT SESSION TODO: Widget Architecture Improvement
+## Widget Architecture
 
-### Current Issue
-Widgets currently mix data selection/preparation logic with pure rendering. This violates separation of concerns.
+### Design Pattern
+Widgets follow a clean separation of concerns: data preparation happens in `generate_content()`, while widgets are pure rendering functions.
 
-### Current Pattern (problematic):
+### ViewData Classes
+Widgets that receive complex data use ViewData dataclasses to define their exact data requirements:
+
 ```python
-# Widget does both data selection AND rendering
-EnergyStatsWidget(bounds, font_loader, full_energy_stats_dict)
-# Inside widget: extract production, consumption, profit, cost from dict
+# Data preparation in generate_content()
+weather_view_data = WeatherViewData(
+    name=data["weather"]["name"],
+    sunrise=data["weather"]["sunrise"],
+    sunset=data["weather"]["sunset"],
+    now_temp=data["weather"]["now"]["temp"],
+    forecast=[ForecastItem(...) for forecast in data["weather"]["forecast"]]
+)
+
+# Widget only renders the prepared data
+WeatherWidget(bounds, font_loader, weather_view_data)
 ```
 
-### Proposed Pattern (better):
-```python
-# Separate data preparation from rendering
-stats_view = EnergyStatsViewData(production=2.5, consumption=1.8, profit=1.25, cost=0.95)
-EnergyStatsWidget(bounds, font_loader, stats_view)
-# Widget only renders the exact data it needs
-```
+### Current Widgets
+- **EnergyStatsWidget** - Uses `EnergyData` ViewData (production, consumption, profit, cost)
+- **EnergyPriceGraphWidget** - Uses `EnergyPriceData` ViewData (day_prices, current_quarter)
+- **EnergyPriceLabelsWidget** - Uses `EnergyPriceData` ViewData (shared with graph)
+- **WeatherWidget** - Uses `WeatherViewData` and `ForecastItem` ViewData classes
+- **HeaderWidget** - Receives `datetime.datetime` directly (no wrapping needed)
+- **FooterWidget** - Receives `datetime.datetime` directly (no wrapping needed)
 
-### Implementation Steps:
-1. **Create ViewData classes** - Simple dataclasses with exactly the data each widget needs
-2. **Extract data preparation logic** - Move from widgets to dedicated functions/classes
-3. **Refactor widgets** - Make them pure rendering functions
-4. **Update tests** - Test data preparation separately from rendering
-5. **Clean up duplicate data structures** - EnergyGraphData and EnergyPriceData are identical
-
-### Benefits:
-- **Pure widgets** - Only rendering, easier to test
-- **Reusable data preparation** - ViewData creation can be tested independently
-- **Clear separation** - Data logic vs display logic
-- **Better naming** - ViewData classes express intent clearly
-
-### Examples to refactor:
-- EnergyStatsWidget: needs `production`, `consumption`, `profit`, `cost` numbers only
-- EnergyPriceLabelsWidget: needs price array + current hour
-- HeaderWidget: needs just datetime
-- FooterWidget: needs just datetime
+All widgets render at their own (0,0) origin using `TranslatedDraw` for positioning.
 
 ## Testing Principles
 
@@ -105,7 +98,7 @@ EnergyStatsWidget(bounds, font_loader, stats_view)
 - Python 3.11 target
 - Ruff linter with 88-character line length
 - Double quotes for strings
-- Tests use pytest with `src/` in Python path
+- Tests use `pytest` with `src/` in Python path
 - Avoid writing code comments. All code should be readable and self-documenting though clear structure, meaningful variable and method names
 
 ### Git Commits

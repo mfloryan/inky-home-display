@@ -11,6 +11,8 @@ from display import (
     FooterWidget,
     EnergyPriceGraphWidget,
     WeatherWidget,
+    WeatherViewData,
+    ForecastItem,
 )
 from display_backend import PngFileBackend
 
@@ -141,16 +143,16 @@ class TestFooterWidget:
 class TestWeatherWidget:
     def test_weather_widget_renders_location_and_current_temperature_at_widget_origin(self):
         bounds = Rectangle(280, 6, 120, 200)
-        weather_data = {
-            "name": "Stockholm",
-            "sunrise": datetime.datetime(2023, 12, 25, 8, 30),
-            "sunset": datetime.datetime(2023, 12, 25, 15, 45),
-            "now": {"temp": 2.5},
-            "forecast": [
-                {"time": datetime.datetime(2023, 12, 25, 18, 0), "temp": 1, "weather": "pochmurno"},
-                {"time": datetime.datetime(2023, 12, 25, 21, 0), "temp": -1, "weather": "śnieg"},
+        weather_data = WeatherViewData(
+            name="Stockholm",
+            sunrise=datetime.datetime(2023, 12, 25, 8, 30),
+            sunset=datetime.datetime(2023, 12, 25, 15, 45),
+            now_temp=2.5,
+            forecast=[
+                ForecastItem(time=datetime.datetime(2023, 12, 25, 18, 0), temp=1, weather="pochmurno"),
+                ForecastItem(time=datetime.datetime(2023, 12, 25, 21, 0), temp=-1, weather="śnieg"),
             ]
-        }
+        )
         mock_font_loader = MagicMock()
         widget = WeatherWidget(bounds, mock_font_loader, weather_data)
 
