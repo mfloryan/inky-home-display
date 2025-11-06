@@ -104,7 +104,10 @@ def _filter_lahallsviadukten_departures(raw_departures, walk_minutes):
                 "destination": destination,
                 "scheduled_time": scheduled_time,
                 "walk_time_minutes": walk_minutes,
-                "is_missed": minutes_until < walk_minutes
+                "is_missed": minutes_until < walk_minutes,
+                "transport_mode": dep.get("line", {}).get("transport_mode"),
+                "journey_state": dep.get("journey", {}).get("state"),
+                "journey": dep.get("journey", {}),
             })
 
     return filtered
@@ -132,7 +135,10 @@ def _filter_roslags_nasby_departures(raw_departures, walk_minutes):
                 "destination": direction,
                 "scheduled_time": scheduled_time,
                 "walk_time_minutes": walk_minutes,
-                "is_missed": minutes_until < walk_minutes
+                "is_missed": minutes_until < walk_minutes,
+                "transport_mode": transport_mode,
+                "journey_state": dep.get("journey", {}).get("state"),
+                "journey": dep.get("journey", {}),
             })
 
     return filtered

@@ -18,7 +18,14 @@ The API returns a **flat list** of departure objects with the following structur
         "destination": "Danderyds sjukhus",
         "scheduled_time": datetime(2025, 11, 6, 14, 36, 36),  # datetime object
         "walk_time_minutes": 6,
-        "is_missed": False
+        "is_missed": False,
+        "transport_mode": "BUS",  # BUS, TRAM, etc.
+        "journey_state": "EXPECTED",  # EXPECTED, NORMALPROGRESS, ATORIGIN, etc.
+        "journey": {  # Full journey object pass-through
+            "id": 2025110601436,
+            "state": "EXPECTED",
+            "prediction_state": "NORMAL"
+        }
     },
     {
         "stop_name": "Roslags Näsby",
@@ -26,7 +33,14 @@ The API returns a **flat list** of departure objects with the following structur
         "destination": "Stockholms östra",
         "scheduled_time": datetime(2025, 11, 6, 14, 18, 0),  # datetime object
         "walk_time_minutes": 10,
-        "is_missed": False
+        "is_missed": False,
+        "transport_mode": "TRAM",
+        "journey_state": "NORMALPROGRESS",
+        "journey": {
+            "id": 2025110601640,
+            "state": "NORMALPROGRESS",
+            "prediction_state": "NORMAL"
+        }
     }
 ]
 ```
@@ -59,6 +73,9 @@ The API returns a **flat list** of departure objects with the following structur
    - `scheduled_time` is a Python `datetime` object (not string)
    - Sorted by scheduled time (earliest first)
    - Flat list structure with `stop_name` as property
+   - `transport_mode` flattened from `line.transport_mode` ("BUS", "TRAM", etc.)
+   - `journey_state` flattened from `journey.state` (vehicle status)
+   - `journey` full object included as pass-through for additional journey data
 
 ## API Functions
 

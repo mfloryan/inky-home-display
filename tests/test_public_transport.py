@@ -55,9 +55,10 @@ class TestMorningDepartures:
 
         lahalls_raw = [
             {
-                "line": {"designation": "605"},
+                "line": {"designation": "605", "transport_mode": "BUS"},
                 "destination": "Danderyds sjukhus",
                 "scheduled": "2025-11-06T08:30:00",
+                "journey": {"id": 1, "state": "EXPECTED", "prediction_state": "NORMAL"},
             }
         ]
 
@@ -66,6 +67,7 @@ class TestMorningDepartures:
                 "line": {"designation": "27", "transport_mode": "TRAM"},
                 "direction": "Stockholms östra",
                 "scheduled": "2025-11-06T08:15:00",
+                "journey": {"id": 2, "state": "NORMALPROGRESS", "prediction_state": "NORMAL"},
             }
         ]
 
@@ -93,19 +95,22 @@ class TestLahallsviaduktenFiltering:
         # Arrange
         raw_departures = [
             {
-                "line": {"designation": "605"},
+                "line": {"designation": "605", "transport_mode": "BUS"},
                 "destination": "Danderyds sjukhus",
                 "scheduled": "2025-11-06T08:30:00",
+                "journey": {"id": 1, "state": "EXPECTED", "prediction_state": "NORMAL"},
             },
             {
-                "line": {"designation": "605"},
+                "line": {"designation": "605", "transport_mode": "BUS"},
                 "destination": "Gribbylund",
                 "scheduled": "2025-11-06T08:35:00",
+                "journey": {"id": 2, "state": "EXPECTED", "prediction_state": "NORMAL"},
             },
             {
-                "line": {"designation": "619"},
+                "line": {"designation": "619", "transport_mode": "BUS"},
                 "destination": "Danderyds sjukhus",
                 "scheduled": "2025-11-06T08:40:00",
+                "journey": {"id": 3, "state": "EXPECTED", "prediction_state": "NORMAL"},
             },
         ]
 
@@ -123,9 +128,10 @@ class TestLahallsviaduktenFiltering:
         # Arrange
         raw_departures = [
             {
-                "line": {"designation": "605"},
+                "line": {"designation": "605", "transport_mode": "BUS"},
                 "destination": "Danderyds sjukhus",
                 "scheduled": "2025-11-06T08:04:00",
+                "journey": {"id": 1, "state": "EXPECTED", "prediction_state": "NORMAL"},
             }
         ]
 
@@ -141,9 +147,10 @@ class TestLahallsviaduktenFiltering:
         # Arrange
         raw_departures = [
             {
-                "line": {"designation": "605"},
+                "line": {"designation": "605", "transport_mode": "BUS"},
                 "destination": "Danderyds sjukhus",
                 "scheduled": "2025-11-06T08:10:00",
+                "journey": {"id": 1, "state": "EXPECTED", "prediction_state": "NORMAL"},
             }
         ]
 
@@ -159,9 +166,14 @@ class TestLahallsviaduktenFiltering:
         # Arrange
         raw_departures = [
             {
-                "line": {"designation": "605"},
+                "line": {"designation": "605", "transport_mode": "BUS"},
                 "destination": "Danderyds sjukhus",
                 "scheduled": "2025-11-06T08:30:00",
+                "journey": {
+                    "id": 2025110600123,
+                    "state": "EXPECTED",
+                    "prediction_state": "NORMAL"
+                },
             }
         ]
 
@@ -178,6 +190,11 @@ class TestLahallsviaduktenFiltering:
         assert departure["scheduled_time"] == datetime(2025, 11, 6, 8, 30)
         assert departure["walk_time_minutes"] == 6
         assert "is_missed" in departure
+        assert departure["transport_mode"] == "BUS"
+        assert departure["journey_state"] == "EXPECTED"
+        assert departure["journey"]["id"] == 2025110600123
+        assert departure["journey"]["state"] == "EXPECTED"
+        assert departure["journey"]["prediction_state"] == "NORMAL"
 
 
 class TestRoslagsNasbyFiltering:
@@ -188,21 +205,25 @@ class TestRoslagsNasbyFiltering:
                 "line": {"designation": "27", "transport_mode": "TRAM"},
                 "direction": "Stockholms östra",
                 "scheduled": "2025-11-06T08:15:00",
+                "journey": {"id": 1, "state": "EXPECTED", "prediction_state": "NORMAL"},
             },
             {
                 "line": {"designation": "28", "transport_mode": "TRAM"},
                 "direction": "Stockholms östra",
                 "scheduled": "2025-11-06T08:20:00",
+                "journey": {"id": 2, "state": "EXPECTED", "prediction_state": "NORMAL"},
             },
             {
                 "line": {"designation": "27", "transport_mode": "TRAM"},
                 "direction": "Kårsta",
                 "scheduled": "2025-11-06T08:25:00",
+                "journey": {"id": 3, "state": "EXPECTED", "prediction_state": "NORMAL"},
             },
             {
                 "line": {"designation": "605", "transport_mode": "BUS"},
                 "direction": "Stockholms östra",
                 "scheduled": "2025-11-06T08:30:00",
+                "journey": {"id": 4, "state": "EXPECTED", "prediction_state": "NORMAL"},
             },
         ]
 
@@ -224,6 +245,7 @@ class TestRoslagsNasbyFiltering:
                 "line": {"designation": "27", "transport_mode": "TRAM"},
                 "direction": "Stockholms östra",
                 "scheduled": "2025-11-06T08:08:00",
+                "journey": {"id": 1, "state": "EXPECTED", "prediction_state": "NORMAL"},
             }
         ]
 
@@ -242,6 +264,11 @@ class TestRoslagsNasbyFiltering:
                 "line": {"designation": "27", "transport_mode": "TRAM"},
                 "direction": "Stockholms östra",
                 "scheduled": "2025-11-06T08:15:00",
+                "journey": {
+                    "id": 2025110600456,
+                    "state": "NORMALPROGRESS",
+                    "prediction_state": "NORMAL"
+                },
             }
         ]
 
@@ -257,6 +284,11 @@ class TestRoslagsNasbyFiltering:
         assert departure["destination"] == "Stockholms östra"
         assert departure["scheduled_time"] == datetime(2025, 11, 6, 8, 15)
         assert departure["walk_time_minutes"] == 10
+        assert departure["transport_mode"] == "TRAM"
+        assert departure["journey_state"] == "NORMALPROGRESS"
+        assert departure["journey"]["id"] == 2025110600456
+        assert departure["journey"]["state"] == "NORMALPROGRESS"
+        assert departure["journey"]["prediction_state"] == "NORMAL"
 
 
 class TestTimeWindowFilter:
