@@ -21,10 +21,10 @@ def get_morning_departures(now):
     ]
 
     all_departures = [
-        _transform_departure(dep, BUS_STOP_WALK_MINUTES) for dep in filtered_buses
+        _transform_departure(dep, BUS_STOP_WALK_MINUTES, now) for dep in filtered_buses
     ]
     all_departures.extend(
-        [_transform_departure(dep, TRAIN_STOP_WALK_MINUTES) for dep in filtered_trains]
+        [_transform_departure(dep, TRAIN_STOP_WALK_MINUTES, now) for dep in filtered_trains]
     )
     all_departures.sort(key=lambda d: d["scheduled_time"])
 
@@ -56,9 +56,12 @@ def _fetch_departures(site_id):
     return data.get("departures", [])
 
 
-def _transform_departure(raw, walk_time_minutes):
+def _transform_departure(raw, walk_time_minutes, now):
     scheduled_str = raw["scheduled"]
     scheduled_time = datetime.fromisoformat(scheduled_str)
+
+    time_until_departure = (scheduled_time - now).total_seconds() / 60
+    is_missed = time_until_departure < walk_time_minutes
 
     return {
         "stop_name": raw["stop_area"]["name"],
@@ -68,4 +71,5 @@ def _transform_departure(raw, walk_time_minutes):
         "transport_mode": raw["line"]["transport_mode"],
         "journey_state": raw["journey"]["state"],
         "walk_time_minutes": walk_time_minutes,
+        "is_missed": is_missed,
     }
