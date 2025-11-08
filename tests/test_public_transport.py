@@ -29,6 +29,7 @@ def test_fetches_departures_during_morning_hours(mock_get):
                 "scheduled": "2025-11-08T08:17:36",
                 "line": {"designation": "605", "transport_mode": "BUS"},
                 "journey": {"id": 123, "state": "EXPECTED"},
+                "stop_area": {"name": "Lahällsviadukten"},
             }
         ]
     }
@@ -38,6 +39,7 @@ def test_fetches_departures_during_morning_hours(mock_get):
 
     expected = [
         {
+            "stop_name": "Lahällsviadukten",
             "destination": "Danderyds sjukhus",
             "line_number": "605",
             "scheduled_time": datetime(2025, 11, 8, 8, 17, 36),
@@ -59,18 +61,21 @@ def test_filters_only_bus_605_to_danderyds_sjukhus(mock_get):
                 "scheduled": "2025-11-08T08:02:11",
                 "line": {"designation": "627", "transport_mode": "BUS"},
                 "journey": {"id": 111, "state": "EXPECTED"},
+                "stop_area": {"name": "Lahällsviadukten"},
             },
             {
                 "destination": "Danderyds sjukhus",
                 "scheduled": "2025-11-08T08:17:36",
                 "line": {"designation": "605", "transport_mode": "BUS"},
                 "journey": {"id": 222, "state": "EXPECTED"},
+                "stop_area": {"name": "Lahällsviadukten"},
             },
             {
                 "destination": "Gribbylund",
                 "scheduled": "2025-11-08T08:23:23",
                 "line": {"designation": "605", "transport_mode": "BUS"},
                 "journey": {"id": 333, "state": "EXPECTED"},
+                "stop_area": {"name": "Lahällsviadukten"},
             },
         ]
     }
@@ -80,6 +85,7 @@ def test_filters_only_bus_605_to_danderyds_sjukhus(mock_get):
 
     expected = [
         {
+            "stop_name": "Lahällsviadukten",
             "destination": "Danderyds sjukhus",
             "line_number": "605",
             "scheduled_time": datetime(2025, 11, 8, 8, 17, 36),

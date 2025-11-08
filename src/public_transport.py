@@ -37,6 +37,7 @@ def _transform_departure(raw):
     scheduled_time = datetime.fromisoformat(scheduled_str)
 
     return {
+        "stop_name": raw["stop_area"]["name"],
         "destination": raw["destination"],
         "line_number": raw["line"]["designation"],
         "scheduled_time": scheduled_time,
