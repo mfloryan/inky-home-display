@@ -1,16 +1,27 @@
 import requests
 from datetime import datetime
 
-SITE_ID = 2216
+BUS_STOP_SITE_ID = 2216
+TRAIN_STOP_SITE_ID = 9633
 
 
 def get_morning_departures(now):
     if not _is_morning_hours(now):
         return []
 
-    raw_departures = _fetch_departures()
-    filtered = [dep for dep in raw_departures if _is_expected_bus_departure(dep)]
-    return [_transform_departure(dep) for dep in filtered]
+    bus_departures = _fetch_departures(BUS_STOP_SITE_ID)
+    filtered_buses = [dep for dep in bus_departures if _is_expected_bus_departure(dep)]
+
+    train_departures = _fetch_departures(TRAIN_STOP_SITE_ID)
+    filtered_trains = [
+        dep for dep in train_departures if _is_expected_train_departure(dep)
+    ]
+
+    all_departures = [_transform_departure(dep) for dep in filtered_buses]
+    all_departures.extend([_transform_departure(dep) for dep in filtered_trains])
+    all_departures.sort(key=lambda d: d["scheduled_time"])
+
+    return all_departures
 
 
 def _is_morning_hours(now):
@@ -26,8 +37,14 @@ def _is_expected_bus_departure(departure):
     )
 
 
-def _fetch_departures():
-    response = requests.get(f"https://transport.integration.sl.se/v1/sites/{SITE_ID}/departures")
+def _is_expected_train_departure(departure):
+    line = departure.get("line", {})
+    destination = departure.get("destination", "")
+    return line.get("transport_mode") == "TRAM" and "Stockholms östra" in destination
+
+
+def _fetch_departures(site_id):
+    response = requests.get(f"https://transport.integration.sl.se/v1/sites/{site_id}/departures")
     data = response.json()
     return data.get("departures", [])
 

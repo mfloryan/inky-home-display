@@ -95,3 +95,59 @@ def test_filters_only_bus_605_to_danderyds_sjukhus(mock_get):
     ]
 
     assert departures == expected
+
+
+@patch("public_transport.requests.get")
+def test_returns_departures_from_both_stops(mock_get):
+    def mock_api_response(url):
+        response = Mock()
+        if "2216" in url:
+            response.json.return_value = {
+                "departures": [
+                    {
+                        "destination": "Danderyds sjukhus",
+                        "scheduled": "2025-11-08T08:17:36",
+                        "line": {"designation": "605", "transport_mode": "BUS"},
+                        "journey": {"id": 123, "state": "EXPECTED"},
+                        "stop_area": {"name": "Lahällsviadukten"},
+                    }
+                ]
+            }
+        elif "9633" in url:
+            response.json.return_value = {
+                "departures": [
+                    {
+                        "destination": "Stockholms östra",
+                        "scheduled": "2025-11-08T08:15:00",
+                        "line": {"designation": "27", "transport_mode": "TRAM"},
+                        "journey": {"id": 456, "state": "NORMALPROGRESS"},
+                        "stop_area": {"name": "Roslags Näsby"},
+                    }
+                ]
+            }
+        return response
+
+    mock_get.side_effect = mock_api_response
+
+    departures = get_morning_departures(now=time(hour=8))
+
+    expected = [
+        {
+            "stop_name": "Roslags Näsby",
+            "destination": "Stockholms östra",
+            "line_number": "27",
+            "scheduled_time": datetime(2025, 11, 8, 8, 15, 0),
+            "transport_mode": "TRAM",
+            "journey_state": "NORMALPROGRESS",
+        },
+        {
+            "stop_name": "Lahällsviadukten",
+            "destination": "Danderyds sjukhus",
+            "line_number": "605",
+            "scheduled_time": datetime(2025, 11, 8, 8, 17, 36),
+            "transport_mode": "BUS",
+            "journey_state": "EXPECTED",
+        },
+    ]
+
+    assert departures == expected
