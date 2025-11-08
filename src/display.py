@@ -22,8 +22,8 @@ from widgets import (
 LAYOUT = {
     "header": Rectangle(4, 0, 396, 25),
     "price_labels": Rectangle(10, 28, 260, 30),
-    "energy_stats": Rectangle(270, 28, 130, 100),
-    "energy_graph": Rectangle(6, 60, 194, 200),
+    "energy_stats": Rectangle(200, 256, 0, 65),
+    "energy_graph": Rectangle(6, 60, 194, 194),
     "weather": Rectangle(280, 6, 120, 200),
     "footer": Rectangle(200, 287, 200, 13),
 }
