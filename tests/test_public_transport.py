@@ -210,3 +210,71 @@ def test_marks_departures_as_missed_when_scheduled_within_walk_time(mock_get):
     ]
 
     assert departures == expected
+
+
+@patch("public_transport.requests.get")
+def test_filters_departures_beyond_30_minutes(mock_get):
+    mock_response = Mock()
+    mock_response.json.return_value = {
+        "departures": [
+            {
+                "destination": "Danderyds sjukhus",
+                "scheduled": "2025-11-08T08:15:00",
+                "line": {"designation": "605", "transport_mode": "BUS"},
+                "journey": {"id": 111, "state": "EXPECTED"},
+                "stop_area": {"name": "Lahällsviadukten"},
+            },
+            {
+                "destination": "Danderyds sjukhus",
+                "scheduled": "2025-11-08T08:25:00",
+                "line": {"designation": "605", "transport_mode": "BUS"},
+                "journey": {"id": 222, "state": "EXPECTED"},
+                "stop_area": {"name": "Lahällsviadukten"},
+            },
+            {
+                "destination": "Danderyds sjukhus",
+                "scheduled": "2025-11-08T08:45:00",
+                "line": {"designation": "605", "transport_mode": "BUS"},
+                "journey": {"id": 333, "state": "EXPECTED"},
+                "stop_area": {"name": "Lahällsviadukten"},
+            },
+        ]
+    }
+    mock_get.return_value = mock_response
+
+    now = datetime(2025, 11, 8, 8, 0, 0)
+    departures = get_morning_departures(now=now)
+
+    assert len(departures) == 2
+    assert departures[0]["scheduled_time"] == datetime(2025, 11, 8, 8, 15, 0)
+    assert departures[1]["scheduled_time"] == datetime(2025, 11, 8, 8, 25, 0)
+
+
+@patch("public_transport.requests.get")
+def test_always_returns_at_least_one_departure_even_beyond_30_minutes(mock_get):
+    mock_response = Mock()
+    mock_response.json.return_value = {
+        "departures": [
+            {
+                "destination": "Danderyds sjukhus",
+                "scheduled": "2025-11-08T08:45:00",
+                "line": {"designation": "605", "transport_mode": "BUS"},
+                "journey": {"id": 111, "state": "EXPECTED"},
+                "stop_area": {"name": "Lahällsviadukten"},
+            },
+            {
+                "destination": "Danderyds sjukhus",
+                "scheduled": "2025-11-08T09:00:00",
+                "line": {"designation": "605", "transport_mode": "BUS"},
+                "journey": {"id": 222, "state": "EXPECTED"},
+                "stop_area": {"name": "Lahällsviadukten"},
+            },
+        ]
+    }
+    mock_get.return_value = mock_response
+
+    now = datetime(2025, 11, 8, 8, 0, 0)
+    departures = get_morning_departures(now=now)
+
+    assert len(departures) == 1
+    assert departures[0]["scheduled_time"] == datetime(2025, 11, 8, 8, 45, 0)

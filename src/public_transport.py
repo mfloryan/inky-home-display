@@ -28,7 +28,17 @@ def get_morning_departures(now):
     )
     all_departures.sort(key=lambda d: d["scheduled_time"])
 
-    return all_departures
+    if not all_departures:
+        return []
+
+    result = [all_departures[0]]
+
+    for departure in all_departures[1:]:
+        time_until_departure = (departure["scheduled_time"] - now).total_seconds() / 60
+        if time_until_departure <= 30:
+            result.append(departure)
+
+    return result
 
 
 def _is_morning_hours(now):
