@@ -45,6 +45,7 @@ def test_fetches_departures_during_morning_hours(mock_get):
             "scheduled_time": datetime(2025, 11, 8, 8, 17, 36),
             "transport_mode": "BUS",
             "journey_state": "EXPECTED",
+            "walk_time_minutes": 6,
         }
     ]
 
@@ -91,6 +92,7 @@ def test_filters_only_bus_605_to_danderyds_sjukhus(mock_get):
             "scheduled_time": datetime(2025, 11, 8, 8, 17, 36),
             "transport_mode": "BUS",
             "journey_state": "EXPECTED",
+            "walk_time_minutes": 6,
         }
     ]
 
@@ -139,6 +141,7 @@ def test_returns_departures_from_both_stops(mock_get):
             "scheduled_time": datetime(2025, 11, 8, 8, 15, 0),
             "transport_mode": "TRAM",
             "journey_state": "NORMALPROGRESS",
+            "walk_time_minutes": 10,
         },
         {
             "stop_name": "Lahällsviadukten",
@@ -147,6 +150,7 @@ def test_returns_departures_from_both_stops(mock_get):
             "scheduled_time": datetime(2025, 11, 8, 8, 17, 36),
             "transport_mode": "BUS",
             "journey_state": "EXPECTED",
+            "walk_time_minutes": 6,
         },
     ]
 
