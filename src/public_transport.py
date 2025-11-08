@@ -1,11 +1,19 @@
 import requests
 from datetime import datetime
+from cache import cache
 
 BUS_STOP_SITE_ID = 2216
 TRAIN_STOP_SITE_ID = 9633
 
 BUS_STOP_WALK_MINUTES = 6
 TRAIN_STOP_WALK_MINUTES = 10
+
+CACHE_INTERVAL_MINUTES = 10
+
+
+def get_morning_departures_cached(now):
+    cache_key = _generate_cache_key(now)
+    return cache(cache_key, lambda: get_morning_departures(now))
 
 
 def get_morning_departures(now):
@@ -83,3 +91,9 @@ def _transform_departure(raw, walk_time_minutes, now):
         "walk_time_minutes": walk_time_minutes,
         "is_missed": is_missed,
     }
+
+
+def _generate_cache_key(now):
+    rounded_minute = (now.minute // CACHE_INTERVAL_MINUTES) * CACHE_INTERVAL_MINUTES
+    cache_time = now.replace(minute=rounded_minute, second=0, microsecond=0)
+    return cache_time.strftime("sl-departures-%Y%m%d-%H%M")

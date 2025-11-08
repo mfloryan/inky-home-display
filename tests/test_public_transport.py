@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime
 from unittest.mock import patch, Mock
-from public_transport import get_morning_departures
+from public_transport import get_morning_departures, get_morning_departures_cached
 
 
 @pytest.mark.parametrize(
@@ -278,3 +278,36 @@ def test_always_returns_at_least_one_departure_even_beyond_30_minutes(mock_get):
 
     assert len(departures) == 1
     assert departures[0]["scheduled_time"] == datetime(2025, 11, 8, 8, 45, 0)
+
+
+@patch("public_transport.cache")
+@patch("public_transport.get_morning_departures")
+def test_caches_with_10_minute_intervals(mock_get_departures, mock_cache):
+    mock_cache.return_value = []
+
+    now = datetime(2025, 11, 8, 8, 17, 30)
+    get_morning_departures_cached(now=now)
+
+    mock_cache.assert_called_once()
+    cache_key = mock_cache.call_args[0][0]
+    assert cache_key == "sl-departures-20251108-0810"
+
+
+@patch("public_transport.cache")
+@patch("public_transport.get_morning_departures")
+def test_cache_key_rounds_to_10_minute_intervals(mock_get_departures, mock_cache):
+    mock_cache.return_value = []
+
+    test_times = [
+        (datetime(2025, 11, 8, 8, 0, 0), "sl-departures-20251108-0800"),
+        (datetime(2025, 11, 8, 8, 9, 59), "sl-departures-20251108-0800"),
+        (datetime(2025, 11, 8, 8, 10, 0), "sl-departures-20251108-0810"),
+        (datetime(2025, 11, 8, 8, 19, 30), "sl-departures-20251108-0810"),
+        (datetime(2025, 11, 8, 8, 20, 0), "sl-departures-20251108-0820"),
+    ]
+
+    for now, expected_key in test_times:
+        mock_cache.reset_mock()
+        get_morning_departures_cached(now=now)
+        cache_key = mock_cache.call_args[0][0]
+        assert cache_key == expected_key
