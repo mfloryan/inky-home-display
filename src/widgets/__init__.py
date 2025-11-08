@@ -7,6 +7,7 @@ from widgets.energy import (
     EnergyStatsWidget,
 )
 from widgets.layout import FooterWidget, HeaderWidget
+from widgets.transport import TransportWidget
 from widgets.weather import ForecastItem, WeatherViewData, WeatherWidget
 
 __all__ = [
@@ -22,6 +23,7 @@ __all__ = [
     "FooterWidget",
     "HeaderWidget",
     "ForecastItem",
+    "TransportWidget",
     "WeatherViewData",
     "WeatherWidget",
 ]

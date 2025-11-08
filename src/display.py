@@ -14,6 +14,7 @@ from widgets import (
     HeaderWidget,
     Rectangle,
     TranslatedDraw,
+    TransportWidget,
     WeatherViewData,
     WeatherWidget,
 )
@@ -24,6 +25,7 @@ LAYOUT = {
     "price_labels": Rectangle(10, 28, 260, 30),
     "energy_stats": Rectangle(200, 256, 0, 65),
     "energy_graph": Rectangle(6, 60, 194, 194),
+    "transport": Rectangle(202, 28, 76, 259),
     "weather": Rectangle(280, 6, 120, 200),
     "footer": Rectangle(200, 287, 200, 13),
 }
@@ -92,6 +94,10 @@ def create_footer_widget(bounds, data, font_loader):
     return [FooterWidget(bounds, font_loader, data["current_time"])]
 
 
+def create_transport_widget(bounds, data, font_loader):
+    return [TransportWidget(bounds, font_loader)]
+
+
 def generate_content(draw, data, colours):
     font_loader = FontLoader()
     locale.setlocale(locale.LC_ALL, "pl_PL.utf8")
@@ -104,6 +110,7 @@ def generate_content(draw, data, colours):
         )
     )
     widgets.extend(create_energy_stats_widget(LAYOUT["energy_stats"], data, font_loader))
+    widgets.extend(create_transport_widget(LAYOUT["transport"], data, font_loader))
     widgets.extend(create_weather_widget(LAYOUT["weather"], data, font_loader))
     widgets.extend(create_footer_widget(LAYOUT["footer"], data, font_loader))
 
