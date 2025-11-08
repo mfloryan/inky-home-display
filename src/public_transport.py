@@ -9,11 +9,21 @@ def get_morning_departures(now):
         return []
 
     raw_departures = _fetch_departures()
-    return [_transform_departure(dep) for dep in raw_departures]
+    filtered = [dep for dep in raw_departures if _is_expected_bus_departure(dep)]
+    return [_transform_departure(dep) for dep in filtered]
 
 
 def _is_morning_hours(now):
     return 7 <= now.hour < 11
+
+
+def _is_expected_bus_departure(departure):
+    line = departure.get("line", {})
+    return (
+        line.get("designation") == "605"
+        and line.get("transport_mode") == "BUS"
+        and departure.get("destination") == "Danderyds sjukhus"
+    )
 
 
 def _fetch_departures():
