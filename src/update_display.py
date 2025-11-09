@@ -2,11 +2,11 @@
 
 import argparse
 from datetime import datetime
+
 from display import display
+from public_transport import get_morning_departures_cached
 from tibber import tibber_energy_prices, tibber_energy_stats
 from weather import get_weather
-# from test_fonts import test_fonts
-# from public_transport import getDeparturesBasedOnTimeOfDay, getDeparturesForSiteId
 
 
 def main():
@@ -18,14 +18,15 @@ def main():
 
     args = parser.parse_args()
 
+    current_time = datetime.now()
+
     data = {
         "energy_prices": tibber_energy_prices(),
         "energy_stats": tibber_energy_stats(),
         "weather": get_weather(),
-        "current_time": datetime.now(),
+        "transport": get_morning_departures_cached(current_time),
+        "current_time": current_time,
     }
-    # transport = getDeparturesBasedOnTimeOfDay()
-    # print(transport)
 
     prefer_inky = not args.png_only
     display(data, prefer_inky=prefer_inky, png_output_path=args.output)

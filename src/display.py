@@ -1,9 +1,11 @@
 import locale
+
 from PIL import ImageDraw
 
 from display_backend import create_backend
 from fonts import FontLoader
 from widgets import (
+    DepartureViewData,
     EnergyData,
     EnergyPriceData,
     EnergyPriceGraphWidget,
@@ -14,6 +16,7 @@ from widgets import (
     HeaderWidget,
     Rectangle,
     TranslatedDraw,
+    TransportViewData,
     TransportWidget,
     WeatherViewData,
     WeatherWidget,
@@ -25,7 +28,7 @@ LAYOUT = {
     "price_labels": Rectangle(10, 28, 260, 30),
     "energy_stats": Rectangle(200, 256, 0, 65),
     "energy_graph": Rectangle(6, 60, 194, 194),
-    "transport": Rectangle(202, 28, 76, 259),
+    "transport": Rectangle(202, 60, 76, 227),
     "weather": Rectangle(280, 6, 120, 200),
     "footer": Rectangle(200, 287, 200, 13),
 }
@@ -95,7 +98,20 @@ def create_footer_widget(bounds, data, font_loader):
 
 
 def create_transport_widget(bounds, data, font_loader):
-    return [TransportWidget(bounds, font_loader)]
+    if not data.get("transport"):
+        return []
+
+    departures = [
+        DepartureViewData(
+            line_number=departure["line_number"],
+            scheduled_time=departure["scheduled_time"],
+            is_missed=departure["is_missed"],
+        )
+        for departure in data["transport"]
+    ]
+
+    transport_data = TransportViewData(departures=departures)
+    return [TransportWidget(bounds, font_loader, transport_data)]
 
 
 def generate_content(draw, data, colours):
