@@ -10,6 +10,11 @@ class FontLoader:
             self._cache[cache_key] = loader_func()
         return self._cache[cache_key]
 
+    def _make_terminus_bold(self, size):
+        return ImageFont.truetype(
+            "/usr/share/fonts/opentype/terminus/terminus-bold.otb", size
+        )
+
     def ubuntu_regular(self, size):
         return self._cached_font(
             f"ubuntu_regular_{size}",
@@ -21,23 +26,25 @@ class FontLoader:
     def terminus_bold_16(self):
         return self._cached_font(
             "terminus_bold_16",
-            lambda: ImageFont.load("/usr/share/fonts/X11/misc/ter-u16b_unicode.pil"),
+            lambda: self._make_terminus_bold(16),
         )
 
     def terminus_regular_12(self):
         return self._cached_font(
             "terminus_regular_12",
-            lambda: ImageFont.load("/usr/share/fonts/X11/misc/ter-u12n_unicode.pil"),
+            lambda: ImageFont.truetype(
+                "/usr/share/fonts/opentype/terminus/terminus-normal.otb", 12
+            ),
         )
 
     def terminus_bold_14(self):
         return self._cached_font(
             "terminus_bold_14",
-            lambda: ImageFont.load("/usr/share/fonts/X11/misc/ter-u14b_unicode.pil"),
+            lambda: self._make_terminus_bold(14),
         )
 
     def terminus_bold_22(self):
         return self._cached_font(
             "terminus_bold_22",
-            lambda: ImageFont.load("/usr/share/fonts/X11/misc/ter-u22b_unicode.pil"),
+            lambda: self._make_terminus_bold(22)
         )
