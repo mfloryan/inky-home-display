@@ -12,12 +12,12 @@ class TestFontLoader:
 
         assert mock_truetype.call_count == 1
 
-    @patch("fonts.ImageFont.load")
-    def test_terminus_bold_16_should_cache_and_reuse_same_font(self, mock_load):
+    @patch("fonts.ImageFont.truetype")
+    def test_terminus_bold_16_should_cache_and_reuse_same_font(self, mock_truetype):
         font_loader = FontLoader()
 
         font1 = font_loader.terminus_bold_16()
         font2 = font_loader.terminus_bold_16()
 
-        assert mock_load.call_count == 1
+        assert mock_truetype.call_count == 1
         assert font1 is font2
