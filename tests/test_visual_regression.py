@@ -43,7 +43,39 @@ class TestVisualRegression:
                     {"time": datetime(2024, 1, 15, 21, 0), "temp": -15, "weather": "mroźnie"}
                 ]
             },
-            "current_time": datetime(2024, 1, 15, 10, 30, 0)  # Monday 10:30 AM
+            "current_time": datetime(2024, 1, 15, 10, 30, 0),  # Monday 10:30 AM
+            "transport": [
+                {
+                    "stop_name": "Roslags Näsby",
+                    "destination": "Stockholms östra",
+                    "line_number": "27",
+                    "scheduled_time": datetime(2024, 1, 15, 10, 38, 0),
+                    "transport_mode": "TRAM",
+                    "journey_state": "NORMALPROGRESS",
+                    "walk_time_minutes": 10,
+                    "is_missed": False,
+                },
+                {
+                    "stop_name": "Lahällsviadukten",
+                    "destination": "Danderyds sjukhus",
+                    "line_number": "605",
+                    "scheduled_time": datetime(2024, 1, 15, 10, 42, 0),
+                    "transport_mode": "BUS",
+                    "journey_state": "EXPECTED",
+                    "walk_time_minutes": 6,
+                    "is_missed": False,
+                },
+                {
+                    "stop_name": "Roslags Näsby",
+                    "destination": "Stockholms östra",
+                    "line_number": "27",
+                    "scheduled_time": datetime(2024, 1, 15, 10, 53, 0),
+                    "transport_mode": "TRAM",
+                    "journey_state": "EXPECTED",
+                    "walk_time_minutes": 10,
+                    "is_missed": False,
+                },
+            ]
         }
 
         test_output_path = "out/winter_display_test.png"
