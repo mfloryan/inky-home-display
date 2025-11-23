@@ -9,6 +9,11 @@ def cache(cache_key, operation):
             return json.load(f)
     except FileNotFoundError:
         data = operation()
+
+        # Skip saving empty arrays to disk
+        if data == []:
+            return data
+
         try:
             cache_path = os.path.join(os.path.dirname(__file__), "cache")
             if not os.path.exists(cache_path):

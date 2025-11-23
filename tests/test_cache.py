@@ -72,3 +72,19 @@ class TestCacheFunction:
         # Assert
         cache_content = json.loads(cache_file_path.read_text())
         assert cache_content == operation_data
+
+    def test_should_not_save_empty_array_to_cache_file(self, tmp_path):
+        # Arrange
+        cache_file_path = tmp_path / "empty_cache.json"
+
+        def operation_returning_empty_array():
+            return []
+
+        # Act
+        with patch("cache.os.path.join", return_value=str(cache_file_path)):
+            with patch("cache.os.mkdir"):
+                result = cache("empty_cache", operation_returning_empty_array)
+
+        # Assert
+        assert result == []
+        assert not cache_file_path.exists()
