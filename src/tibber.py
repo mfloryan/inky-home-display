@@ -26,10 +26,27 @@ def load_prices_from_tibber():
     )
 
     response_json = load_data_from_tibber(load_token(), query)
-    hourly = response_json["data"]["viewer"]["homes"][0]["currentSubscription"][
-        "priceInfo"
-    ]["today"]
-    return list(map(lambda _: _["total"], hourly))
+
+    homes = response_json.get("data", {}).get("viewer", {}).get("homes", [])
+    if not homes:
+        raise RuntimeError("No homes found in Tibber API response")
+
+    current_subscription = homes[0].get("currentSubscription")
+    if current_subscription is None:
+        raise RuntimeError(
+            "No active subscription found in Tibber API response. "
+            "Please check your Tibber account status."
+        )
+
+    price_info = current_subscription.get("priceInfo")
+    if price_info is None:
+        raise RuntimeError("No price information available in Tibber API response")
+
+    today_prices = price_info.get("today")
+    if today_prices is None:
+        raise RuntimeError("No prices available for today in Tibber API response")
+
+    return list(map(lambda _: _["total"], today_prices))
 
 
 def load_day_stats_from_tibber():
@@ -40,7 +57,13 @@ def load_day_stats_from_tibber():
         "}}}"
     )
 
-    data = load_data_from_tibber(load_token(), query)["data"]["viewer"]["homes"][0]
+    response_json = load_data_from_tibber(load_token(), query)
+
+    homes = response_json.get("data", {}).get("viewer", {}).get("homes", [])
+    if not homes:
+        raise RuntimeError("No homes found in Tibber API response")
+
+    data = homes[0]
 
     now = datetime.now()
     def today(date):
@@ -48,14 +71,18 @@ def load_day_stats_from_tibber():
 
     stats = {"production": 0, "profit": 0, "consumption": 0, "cost": 0}
 
-    for n in data["production"]["nodes"]:
+    production_data = data.get("production", {})
+    production_nodes = production_data.get("nodes", [])
+    for n in production_nodes:
         if today(datetime.fromisoformat(n["from"])):
             if n["production"]:
                 stats["production"] += n["production"]
             if n["profit"]:
                 stats["profit"] += n["profit"]
 
-    for n in data["consumption"]["nodes"]:
+    consumption_data = data.get("consumption", {})
+    consumption_nodes = consumption_data.get("nodes", [])
+    for n in consumption_nodes:
         if today(datetime.fromisoformat(n["from"])):
             if n["consumption"]:
                 stats["consumption"] += n["consumption"]

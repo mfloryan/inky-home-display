@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 
 import argparse
+import logging
 from datetime import datetime
 
 from display import display
 from public_transport import get_morning_departures_cached
 from tibber import tibber_energy_prices, tibber_energy_stats
 from weather import get_weather
+
+logger = logging.getLogger(__name__)
 
 
 def main():
@@ -18,11 +21,25 @@ def main():
 
     args = parser.parse_args()
 
+    logging.basicConfig(level=logging.INFO)
+
     current_time = datetime.now()
 
+    energy_prices = None
+    try:
+        energy_prices = tibber_energy_prices()
+    except Exception as e:
+        logger.error("Failed to fetch Tibber energy prices: %s", e)
+
+    energy_stats = None
+    try:
+        energy_stats = tibber_energy_stats()
+    except Exception as e:
+        logger.error("Failed to fetch Tibber energy stats: %s", e)
+
     data = {
-        "energy_prices": tibber_energy_prices(),
-        "energy_stats": tibber_energy_stats(),
+        "energy_prices": energy_prices,
+        "energy_stats": energy_stats,
         "weather": get_weather(),
         "transport": get_morning_departures_cached(current_time),
         "current_time": current_time,
