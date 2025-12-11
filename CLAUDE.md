@@ -93,6 +93,29 @@ All widgets render at their own (0,0) origin using `TranslatedDraw` for position
 - **Coverage targets**: 100% coverage should be expected at all times, but these tests must ALWAYS be based on business behaviour, not implementation details
 - Tests must document expected behaviour
 
+### Test Organization
+
+- All test files live in the `tests/` directory, not in `src/`
+- Test files are named `test_*.py` based on the behavior or component being tested
+- Test classes use descriptive names like `TestCacheFunction` or `TestTransportWidget`
+- Test method names describe expected behavior: `test_should_return_cached_data_when_cache_file_exists`
+- Use Arrange-Act-Assert pattern with clear comments separating sections
+
+### When NOT to Write Tests
+
+- When existing code already handles and validates the behavior (e.g., if display.py checks for None, don't write tests that None is passed correctly)
+- When the behavior is already covered by higher-level behavioral tests
+- When a simple code change doesn't introduce new behavior (e.g., renaming variables, formatting)
+- Don't write tests that duplicate what other tests already verify
+- If in doubt whether a test adds value, consider: does this test document a behavior users care about?
+
+### Visual Regression Tests
+
+- Visual regression tests (in `test_visual_regression.py`) only test the happy path with all data sources working correctly
+- These tests detect unintended visual changes in the rendered display output
+- Do NOT add tests for error scenarios or missing data to visual regression tests
+- When display changes intentionally, regenerate baselines with `./test-visual-regression.sh gen`
+
 ### Code Style
 
 - Python 3.11 target
