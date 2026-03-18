@@ -102,13 +102,13 @@ class EnergyPriceGraphWidget(Widget):
                 ((highest_full_sek * dy) / price_max) / highest_full_sek
             )
 
-            for y in range(highest_full_sek):
-                for x in range(1, self.bounds.width):
-                    if x % 2 == 0:
-                        draw.point(
-                            [x, self.bounds.height - (one_sek_step * (y + 1))],
-                            fill=colours[0],
-                        )
+            points = [
+                (x, self.bounds.height - (one_sek_step * (y + 1)))
+                for y in range(highest_full_sek)
+                for x in range(2, self.bounds.width, 2)
+            ]
+            if points:
+                draw.point(points, fill=colours[0])
 
     def _draw_price_bars(self, draw: DrawProtocol, colours: list) -> None:
         dy = self.bounds.height - 2
