@@ -1,5 +1,6 @@
 import requests
 from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor
 from cache import cache
 
 BUS_STOP_SITE_ID = 2216
@@ -20,10 +21,14 @@ def get_morning_departures(now):
     if not _is_morning_hours(now):
         return []
 
-    bus_departures = _fetch_departures(BUS_STOP_SITE_ID)
-    filtered_buses = [dep for dep in bus_departures if _is_expected_bus_departure(dep)]
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        bus_future = executor.submit(_fetch_departures, BUS_STOP_SITE_ID)
+        train_future = executor.submit(_fetch_departures, TRAIN_STOP_SITE_ID)
 
-    train_departures = _fetch_departures(TRAIN_STOP_SITE_ID)
+        bus_departures = bus_future.result()
+        train_departures = train_future.result()
+
+    filtered_buses = [dep for dep in bus_departures if _is_expected_bus_departure(dep)]
     filtered_trains = [
         dep for dep in train_departures if _is_expected_train_departure(dep)
     ]
