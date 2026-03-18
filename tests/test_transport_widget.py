@@ -1,12 +1,26 @@
 import datetime
 
 from PIL import Image, ImageDraw
+import pytest
 
 from fonts import FontLoader
 from widgets import DepartureViewData, Rectangle, TransportViewData, TransportWidget
 
 
 class TestTransportWidget:
+    @pytest.fixture(autouse=True)
+    def patch_font(self, monkeypatch):
+        # We replace FontLoader's font resolution to just use the default font
+        # instead of trying to load system fonts which might be missing on CI
+        from PIL import ImageFont
+        orig_truetype = ImageFont.truetype
+        def safe_truetype(*args, **kwargs):
+            try:
+                return orig_truetype(*args, **kwargs)
+            except OSError:
+                return ImageFont.load_default()
+        monkeypatch.setattr("PIL.ImageFont.truetype", safe_truetype)
+
     def test_renders_departures_with_line_numbers_and_times(self):
         bounds = Rectangle(0, 0, 76, 227)
         font_loader = FontLoader()
