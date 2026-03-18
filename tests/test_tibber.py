@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 import tibber
 
 
@@ -94,7 +94,12 @@ def test_load_stats_raises_error_when_no_homes_in_response():
             tibber.load_day_stats_from_tibber()
 
 
-def test_load_stats_handles_missing_production_data():
+@patch("tibber.datetime")
+def test_load_stats_handles_missing_production_data(mock_datetime):
+    from datetime import datetime
+    mock_datetime.now.return_value = datetime(2025, 12, 11)
+    mock_datetime.fromisoformat = datetime.fromisoformat
+
     with patch("tibber.load_data_from_tibber") as mock_load:
         mock_load.return_value = {
             "data": {
@@ -124,7 +129,12 @@ def test_load_stats_handles_missing_production_data():
         assert stats["cost"] == 1.5
 
 
-def test_load_stats_handles_missing_consumption_data():
+@patch("tibber.datetime")
+def test_load_stats_handles_missing_consumption_data(mock_datetime):
+    from datetime import datetime
+    mock_datetime.now.return_value = datetime(2025, 12, 11)
+    mock_datetime.fromisoformat = datetime.fromisoformat
+
     with patch("tibber.load_data_from_tibber") as mock_load:
         mock_load.return_value = {
             "data": {

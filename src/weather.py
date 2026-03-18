@@ -38,7 +38,7 @@ def get_weather():
         "appid": load_token(),
     }
 
-    r = requests.get("https://api.openweathermap.org/data/2.5/weather", params=payload)
+    r = requests.get("https://api.openweathermap.org/data/2.5/weather", params=payload, timeout=10)
     current_weather = r.json()
     weather = {
         "name": current_weather["name"],
@@ -50,7 +50,7 @@ def get_weather():
     }
 
     payload["cnt"] = 8  # Get next 24h
-    r = requests.get("https://api.openweathermap.org/data/2.5/forecast", params=payload)
+    r = requests.get("https://api.openweathermap.org/data/2.5/forecast", params=payload, timeout=10)
     forecast = r.json()
     weather["forecast"] = list(map(parse_forecast, forecast["list"]))
     return weather
