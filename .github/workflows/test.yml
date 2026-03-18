@@ -13,6 +13,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Set up system fonts and locales
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y fonts-terminus-otb fonts-ubuntu fonts-roboto locales
+        sudo locale-gen pl_PL.UTF-8 en_GB.UTF-8
+
     - name: Set up Python 3.11
       uses: actions/setup-python@v5
       with:
