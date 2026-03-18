@@ -1,9 +1,10 @@
 import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 import tibber
 
 
-def test_load_prices_raises_error_when_no_homes_in_response():
+@patch("tibber.load_token", return_value="fake-token")
+def test_load_prices_raises_error_when_no_homes_in_response(mock_token):
     with patch("tibber.load_data_from_tibber") as mock_load:
         mock_load.return_value = {"data": {"viewer": {"homes": []}}}
 
@@ -13,7 +14,8 @@ def test_load_prices_raises_error_when_no_homes_in_response():
             tibber.load_prices_from_tibber()
 
 
-def test_load_prices_raises_error_when_current_subscription_is_none():
+@patch("tibber.load_token", return_value="fake-token")
+def test_load_prices_raises_error_when_current_subscription_is_none(mock_token):
     with patch("tibber.load_data_from_tibber") as mock_load:
         mock_load.return_value = {
             "data": {"viewer": {"homes": [{"currentSubscription": None}]}}
@@ -26,7 +28,8 @@ def test_load_prices_raises_error_when_current_subscription_is_none():
             tibber.load_prices_from_tibber()
 
 
-def test_load_prices_raises_error_when_price_info_is_none():
+@patch("tibber.load_token", return_value="fake-token")
+def test_load_prices_raises_error_when_price_info_is_none(mock_token):
     with patch("tibber.load_data_from_tibber") as mock_load:
         mock_load.return_value = {
             "data": {
@@ -41,7 +44,8 @@ def test_load_prices_raises_error_when_price_info_is_none():
             tibber.load_prices_from_tibber()
 
 
-def test_load_prices_raises_error_when_today_prices_is_none():
+@patch("tibber.load_token", return_value="fake-token")
+def test_load_prices_raises_error_when_today_prices_is_none(mock_token):
     with patch("tibber.load_data_from_tibber") as mock_load:
         mock_load.return_value = {
             "data": {
@@ -58,7 +62,8 @@ def test_load_prices_raises_error_when_today_prices_is_none():
             tibber.load_prices_from_tibber()
 
 
-def test_load_prices_returns_prices_when_valid_response():
+@patch("tibber.load_token", return_value="fake-token")
+def test_load_prices_returns_prices_when_valid_response(mock_token):
     with patch("tibber.load_data_from_tibber") as mock_load:
         mock_load.return_value = {
             "data": {
@@ -84,7 +89,8 @@ def test_load_prices_returns_prices_when_valid_response():
         assert prices == [0.5, 0.6, 0.7]
 
 
-def test_load_stats_raises_error_when_no_homes_in_response():
+@patch("tibber.load_token", return_value="fake-token")
+def test_load_stats_raises_error_when_no_homes_in_response(mock_token):
     with patch("tibber.load_data_from_tibber") as mock_load:
         mock_load.return_value = {"data": {"viewer": {"homes": []}}}
 
@@ -94,61 +100,71 @@ def test_load_stats_raises_error_when_no_homes_in_response():
             tibber.load_day_stats_from_tibber()
 
 
-def test_load_stats_handles_missing_production_data():
-    with patch("tibber.load_data_from_tibber") as mock_load:
-        mock_load.return_value = {
-            "data": {
-                "viewer": {
-                    "homes": [
-                        {
-                            "consumption": {
-                                "nodes": [
-                                    {
-                                        "from": "2025-12-11T10:00:00+00:00",
-                                        "to": "2025-12-11T11:00:00+00:00",
-                                        "cost": 1.5,
-                                        "consumption": 2.0,
-                                    }
-                                ]
+@patch("tibber.load_token", return_value="fake-token")
+def test_load_stats_handles_missing_production_data(mock_token):
+    import datetime
+    with patch("tibber.datetime") as mock_datetime:
+        mock_datetime.now.return_value.day = 11
+        mock_datetime.fromisoformat.side_effect = lambda x: datetime.datetime.fromisoformat(x)
+        with patch("tibber.load_data_from_tibber") as mock_load:
+            mock_load.return_value = {
+                "data": {
+                    "viewer": {
+                        "homes": [
+                            {
+                                "consumption": {
+                                    "nodes": [
+                                        {
+                                            "from": "2025-12-11T10:00:00+00:00",
+                                            "to": "2025-12-11T11:00:00+00:00",
+                                            "cost": 1.5,
+                                            "consumption": 2.0,
+                                        }
+                                    ]
+                                }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
 
-        stats = tibber.load_day_stats_from_tibber()
-        assert stats["production"] == 0
-        assert stats["profit"] == 0
-        assert stats["consumption"] == 2.0
-        assert stats["cost"] == 1.5
+            stats = tibber.load_day_stats_from_tibber()
+            assert stats["production"] == 0
+            assert stats["profit"] == 0
+            assert stats["consumption"] == 2.0
+            assert stats["cost"] == 1.5
 
 
-def test_load_stats_handles_missing_consumption_data():
-    with patch("tibber.load_data_from_tibber") as mock_load:
-        mock_load.return_value = {
-            "data": {
-                "viewer": {
-                    "homes": [
-                        {
-                            "production": {
-                                "nodes": [
-                                    {
-                                        "from": "2025-12-11T10:00:00+00:00",
-                                        "to": "2025-12-11T11:00:00+00:00",
-                                        "profit": 3.5,
-                                        "production": 4.0,
-                                    }
-                                ]
+@patch("tibber.load_token", return_value="fake-token")
+def test_load_stats_handles_missing_consumption_data(mock_token):
+    import datetime
+    with patch("tibber.datetime") as mock_datetime:
+        mock_datetime.now.return_value.day = 11
+        mock_datetime.fromisoformat.side_effect = lambda x: datetime.datetime.fromisoformat(x)
+        with patch("tibber.load_data_from_tibber") as mock_load:
+            mock_load.return_value = {
+                "data": {
+                    "viewer": {
+                        "homes": [
+                            {
+                                "production": {
+                                    "nodes": [
+                                        {
+                                            "from": "2025-12-11T10:00:00+00:00",
+                                            "to": "2025-12-11T11:00:00+00:00",
+                                            "profit": 3.5,
+                                            "production": 4.0,
+                                        }
+                                    ]
+                                }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
 
-        stats = tibber.load_day_stats_from_tibber()
-        assert stats["production"] == 4.0
-        assert stats["profit"] == 3.5
-        assert stats["consumption"] == 0
-        assert stats["cost"] == 0
+            stats = tibber.load_day_stats_from_tibber()
+            assert stats["production"] == 4.0
+            assert stats["profit"] == 3.5
+            assert stats["consumption"] == 0
+            assert stats["cost"] == 0
