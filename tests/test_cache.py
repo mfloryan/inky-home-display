@@ -88,3 +88,20 @@ class TestCacheFunction:
         # Assert
         assert result == []
         assert not cache_file_path.exists()
+
+    def test_should_handle_exception_during_cache_write_gracefully(self, tmp_path):
+        # Arrange
+        operation_data = {"status": "ok"}
+        cache_file_path = tmp_path / "fail_cache.json"
+
+        def some_operation():
+            return operation_data
+
+        # Act
+        with patch("cache.os.path.join", return_value=str(cache_file_path)):
+            with patch("cache.os.mkdir", side_effect=OSError("Permission denied")):
+                # This should not raise an exception
+                result = cache("fail_cache", some_operation)
+
+        # Assert
+        assert result == operation_data
