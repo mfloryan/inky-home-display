@@ -101,7 +101,7 @@ def test_filters_only_bus_605_to_danderyds_sjukhus(mock_get):
 
 @patch("public_transport.requests.get")
 def test_returns_departures_from_both_stops(mock_get):
-    def mock_api_response(url):
+    def mock_api_response(url, **kwargs):
         response = Mock()
         if "2216" in url:
             response.json.return_value = {
