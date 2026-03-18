@@ -9,12 +9,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE22: true
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Set up system fonts and locales
       run: |
@@ -23,7 +20,7 @@ jobs:
         sudo locale-gen pl_PL.UTF-8 en_GB.UTF-8
 
     - name: Set up Python 3.11
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: "3.11"
         cache: 'pip'
