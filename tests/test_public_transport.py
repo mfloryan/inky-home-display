@@ -34,6 +34,10 @@ def test_fetches_departures_during_morning_hours(mock_get):
     now = datetime(2025, 11, 8, 8, 0, 0)
     departures = get_morning_departures(now=now)
 
+    mock_get.assert_called_with(
+        "https://transport.integration.sl.se/v1/sites/2216/departures", timeout=10
+    )
+
     expected = [
         {
             "stop_name": "Lahällsviadukten",
