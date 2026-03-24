@@ -60,7 +60,20 @@ class TranslatedDraw:
         return self.draw.textbbox(xy, text, **kwargs)
 
     def point(self, xy, **kwargs):
-        translated_xy = (xy[0] + self.offset_x, xy[1] + self.offset_y)
+        if not xy:
+            return self.draw.point(xy, **kwargs)
+
+        if isinstance(xy[0], (int, float)):
+            # [x1, y1, x2, y2, ...] or (x, y)
+            translated_xy = [
+                val + (self.offset_x if i % 2 == 0 else self.offset_y)
+                for i, val in enumerate(xy)
+            ]
+        else:
+            # [(x1, y1), (x2, y2), ...]
+            translated_xy = [
+                (p[0] + self.offset_x, p[1] + self.offset_y) for p in xy
+            ]
         return self.draw.point(translated_xy, **kwargs)
 
     def ellipse(self, xy, **kwargs):
