@@ -1,31 +1,31 @@
-from widgets.base import DrawProtocol, Rectangle, TranslatedDraw, Widget
-from widgets.energy import (
+from .base import DrawProtocol, Rectangle, TranslatedDraw, Widget
+from .energy import (
     EnergyData,
     EnergyPriceData,
     EnergyPriceGraphWidget,
     EnergyPriceLabelsWidget,
     EnergyStatsWidget,
 )
-from widgets.layout import FooterWidget, HeaderWidget
-from widgets.transport import DepartureViewData, TransportViewData, TransportWidget
-from widgets.weather import ForecastItem, WeatherViewData, WeatherWidget
+from .layout import FooterWidget, HeaderWidget
+from .transport import DepartureViewData, TransportViewData, TransportWidget
+from .weather import ForecastItem, WeatherViewData, WeatherWidget
 
 __all__ = [
+    "DepartureViewData",
     "DrawProtocol",
-    "Rectangle",
-    "TranslatedDraw",
-    "Widget",
     "EnergyData",
     "EnergyPriceData",
     "EnergyPriceGraphWidget",
     "EnergyPriceLabelsWidget",
     "EnergyStatsWidget",
     "FooterWidget",
-    "HeaderWidget",
     "ForecastItem",
-    "DepartureViewData",
+    "HeaderWidget",
+    "Rectangle",
+    "TranslatedDraw",
     "TransportViewData",
     "TransportWidget",
     "WeatherViewData",
     "WeatherWidget",
+    "Widget",
 ]
