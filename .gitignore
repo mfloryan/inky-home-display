@@ -5,3 +5,4 @@ __pycache__/
 .venv/
 src/cache/
 .claude/
+CLAUDE.local.md
