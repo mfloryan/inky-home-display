@@ -51,9 +51,11 @@ def get_weather():
         },
     }
 
-    payload["cnt"] = 8  # Get next 24h
+    forecast_payload = payload | {"cnt": 8}  # Get next 24h
     r = requests.get(
-        "https://api.openweathermap.org/data/2.5/forecast", params=payload, timeout=10
+        "https://api.openweathermap.org/data/2.5/forecast",
+        params=forecast_payload,
+        timeout=10,
     )
     forecast = r.json()
     weather["forecast"] = list(map(parse_forecast, forecast["list"]))
