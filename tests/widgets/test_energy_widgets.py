@@ -10,8 +10,8 @@ sys.modules["PIL.Image"] = mock_pil_image
 sys.modules["inky"] = MagicMock()
 sys.modules["inky.auto"] = MagicMock()
 
-from display_backend import PngFileBackend
-from widgets import (
+from display_backend import PngFileBackend  # noqa: E402
+from widgets import (  # noqa: E402
     EnergyData,
     EnergyPriceData,
     EnergyPriceGraphWidget,
