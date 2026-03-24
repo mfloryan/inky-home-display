@@ -1,17 +1,7 @@
-import sys
 from unittest.mock import MagicMock
 
-# Mock PIL and inky before they are imported
-mock_pil = MagicMock()
-mock_pil_image = MagicMock()
-mock_pil.Image = mock_pil_image
-sys.modules["PIL"] = mock_pil
-sys.modules["PIL.Image"] = mock_pil_image
-sys.modules["inky"] = MagicMock()
-sys.modules["inky.auto"] = MagicMock()
-
-from display_backend import PngFileBackend  # noqa: E402
-from widgets import (  # noqa: E402
+from display_backend import PngFileBackend
+from widgets import (
     EnergyData,
     EnergyPriceData,
     EnergyPriceGraphWidget,
