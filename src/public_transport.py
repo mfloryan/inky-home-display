@@ -69,7 +69,9 @@ def _is_expected_train_departure(departure):
 
 
 def _fetch_departures(site_id):
-    response = requests.get(f"https://transport.integration.sl.se/v1/sites/{site_id}/departures")
+    response = requests.get(
+        f"https://transport.integration.sl.se/v1/sites/{site_id}/departures", timeout=10
+    )
     data = response.json()
     return data.get("departures", [])
 
