@@ -42,12 +42,16 @@ jobs:
       run: |
         pytest --junitxml=test-results.xml
 
+    - name: Visual regression tests
+      run: |
+        pytest --mpl --mpl-results-path=out/test-results -m manual tests/test_visual_regression.py -v --junitxml=visual-results.xml
+
     - name: Surface Test Results
-      uses: dorny/test-reporter@v1
+      uses: dorny/test-reporter@v3
       if: always()
       with:
         name: Pytest Results
-        path: test-results.xml
+        path: "*-results.xml"
         reporter: java-junit
 
     - name: Upload Test Results
@@ -55,4 +59,11 @@ jobs:
       uses: actions/upload-artifact@v6
       with:
         name: test-results
-        path: test-results.xml
+        path: "*-results.xml"
+
+    - name: Upload Visual Regression Diffs
+      if: failure()
+      uses: actions/upload-artifact@v6
+      with:
+        name: visual-regression-diffs
+        path: out/test-results
