@@ -1,4 +1,4 @@
-rsync -arv requirements.txt jagoda.mm:/opt/home-display/
+rsync -arv requirements-prod.txt jagoda.mm:/opt/home-display/requirements.txt
 rsync -arv \
  --exclude '__pycache__/' \
  --exclude '.DS_Store' \
