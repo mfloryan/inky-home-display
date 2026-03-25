@@ -17,3 +17,13 @@ services:
       - ./out/cache:/code/src/cache
       - ./pyproject.toml:/code/pyproject.toml
     # Override command when running: docker-compose run inky-display-dev python src/update_display.py --png-only --output img/custom.png
+
+  test:
+    build: .
+    volumes:
+      - ./src:/code/src
+      - ./tests:/code/tests
+      - ./out:/code/out
+      - ./out/cache:/code/src/cache
+      - ./pyproject.toml:/code/pyproject.toml
+    command: /bin/bash -c "ruff check . && pytest"
