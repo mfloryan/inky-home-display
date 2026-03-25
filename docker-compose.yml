@@ -1,6 +1,9 @@
 services:
   inky-display:
-    build: .
+    build:
+      context: .
+      args:
+        INSTALL_DEV: "false"
     volumes:
       - ./src:/code/src
       - ./out:/code/out
@@ -9,7 +12,10 @@ services:
     
   # Alternative service for running with different options
   inky-display-dev:
-    build: .
+    build:
+      context: .
+      args:
+        INSTALL_DEV: "true"
     volumes:
       - ./src:/code/src
       - ./tests:/code/tests
@@ -19,7 +25,10 @@ services:
     # Override command when running: docker-compose run inky-display-dev python src/update_display.py --png-only --output img/custom.png
 
   test:
-    build: .
+    build:
+      context: .
+      args:
+        INSTALL_DEV: "true"
     volumes:
       - ./src:/code/src
       - ./tests:/code/tests
