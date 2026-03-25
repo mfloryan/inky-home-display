@@ -9,6 +9,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: read
 
     steps:
     - uses: actions/checkout@v6
@@ -19,17 +23,16 @@ jobs:
         sudo apt-get install -y fonts-terminus-otb fonts-ubuntu fonts-roboto locales
         sudo locale-gen pl_PL.UTF-8 en_GB.UTF-8
 
-    - name: Set up Python 3.11
+    - name: Set up Python 3.13
       uses: actions/setup-python@v6
       with:
-        python-version: "3.11"
+        python-version: "3.13"
         cache: 'pip'
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install ruff pytest
+        pip install -r requirements-dev.txt
 
     - name: Lint with ruff
       run: |
@@ -37,4 +40,19 @@ jobs:
 
     - name: Test with pytest
       run: |
-        pytest
+        pytest --junitxml=test-results.xml
+
+    - name: Surface Test Results
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: Pytest Results
+        path: test-results.xml
+        reporter: java-junit
+
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: test-results
+        path: test-results.xml

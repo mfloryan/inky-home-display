@@ -11,10 +11,12 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /code
 
 # copy the dependencies file to the working directory
-COPY requirements.txt .
+COPY requirements-prod.txt requirements-dev.txt ./
 
 # install dependencies
-RUN pip install -r requirements.txt
+ARG INSTALL_DEV=false
+RUN pip install -r requirements-prod.txt && \
+    if [ "$INSTALL_DEV" = "true" ] ; then pip install -r requirements-dev.txt ; fi
 
 # add fonts (here to optimise docker build when adding fonts)
 # List of all Arch fonts https://wiki.alpinelinux.org/wiki/Fonts
