@@ -1,5 +1,8 @@
 import os
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def cache(cache_key, operation):
@@ -21,5 +24,5 @@ def cache(cache_key, operation):
             with open(cache_file, mode="w", encoding="utf-8") as f:
                 json.dump(data, f)
         except Exception as exception:
-            print(exception)
+            logger.error("Failed to write to cache: %s", exception)
         return data
