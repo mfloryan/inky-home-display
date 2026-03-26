@@ -1,9 +1,10 @@
 import sys
 from unittest.mock import Mock, patch, mock_open
 import pytest
+import logging
 
 sys.modules["requests"] = Mock()
-import weather  # noqa: E402
+import weather
 
 @pytest.fixture(autouse=True)
 def clear_weather_cache():

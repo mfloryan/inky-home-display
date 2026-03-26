@@ -7,7 +7,7 @@ from display import display
 
 class TestVisualRegression:
     @pytest.mark.manual
-    @pytest.mark.mpl_image_compare(tolerance=50)
+    @pytest.mark.mpl_image_compare
     def test_display_generates_image_with_winter_data(self):
         # Realistic Swedish winter energy data
         test_data = {

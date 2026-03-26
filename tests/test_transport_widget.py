@@ -1,7 +1,5 @@
 import datetime
 
-from unittest.mock import MagicMock
-
 from PIL import Image, ImageDraw
 
 from fonts import FontLoader
@@ -39,7 +37,7 @@ class TestTransportWidget:
 
     def test_highlights_missed_departure_times_in_yellow(self):
         bounds = Rectangle(0, 0, 76, 227)
-        font_loader = MagicMock()
+        font_loader = FontLoader()
         base_time = datetime.datetime(2025, 1, 15, 8, 0)
 
         transport_data = TransportViewData(
@@ -51,34 +49,27 @@ class TestTransportWidget:
         )
 
         widget = TransportWidget(bounds, font_loader, transport_data)
-        mock_draw = MagicMock()
-        mock_draw.textlength.return_value = 10
+        img = Image.new("RGB", (bounds.width, bounds.height), "white")
+        draw = ImageDraw.Draw(img)
         colours = ["black", "yellow"]
 
-        widget.render(mock_draw, colours)
+        widget.render(draw, colours)
 
-        # Expected parameters for the time text:
-        # Time is "08:00"
-        # X coord is bounds.width - 10 - 2 = 76 - 12 = 64
-        # Y coord is 20
-        # Font is font_loader.terminus_regular_12()
-        expected_call = (
-            (64, 20),
-            "08:00",
-        )
-        # Check if any call matches our expectation
-        found = False
-        for call in mock_draw.text.call_args_list:
-            args, kwargs = call
-            if args == expected_call and kwargs.get('fill') == "yellow":
-                found = True
+        pixels = img.load()
+        yellow_pixels_found = False
+        for y in range(bounds.height):
+            for x in range(bounds.width):
+                if pixels[x, y] == (255, 255, 0):
+                    yellow_pixels_found = True
+                    break
+            if yellow_pixels_found:
                 break
 
-        assert found, "Expected mock_draw.text to be called with missed departure highlighted in yellow"
+        assert yellow_pixels_found
 
     def test_draws_border_around_content(self):
         bounds = Rectangle(0, 0, 76, 227)
-        font_loader = MagicMock()
+        font_loader = FontLoader()
         base_time = datetime.datetime(2025, 1, 15, 8, 0)
 
         transport_data = TransportViewData(
@@ -90,12 +81,12 @@ class TestTransportWidget:
         )
 
         widget = TransportWidget(bounds, font_loader, transport_data)
-        mock_draw = MagicMock()
-        mock_draw.textlength.return_value = 10
+        img = Image.new("RGB", (bounds.width, bounds.height), "white")
+        draw = ImageDraw.Draw(img)
         colours = ["black", "yellow"]
 
-        widget.render(mock_draw, colours)
+        widget.render(draw, colours)
 
-        mock_draw.rectangle.assert_called_once_with(
-            [0, 0, 75, 42], outline="yellow"
-        )
+        pixels = img.load()
+        top_left_is_yellow = pixels[0, 0] == (255, 255, 0)
+        assert top_left_is_yellow

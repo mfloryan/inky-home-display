@@ -10,7 +10,7 @@ sys.modules["PIL.Image"] = mock_pil.Image
 sys.modules["inky"] = mock_inky
 sys.modules["inky.auto"] = mock_inky.auto
 
-from display_backend import PngFileBackend, InkyBackend, create_backend  # noqa: E402
+from display_backend import PngFileBackend, InkyBackend, create_backend
 
 class TestPngFileBackend:
     def test_resolution(self):
@@ -23,7 +23,7 @@ class TestPngFileBackend:
 
     def test_create_image(self):
         backend = PngFileBackend()
-        backend.create_image()
+        img = backend.create_image()
         mock_pil.Image.new.assert_called_with("P", size=(400, 300), color=(255, 255, 255))
 
     def test_show(self):
@@ -53,7 +53,7 @@ class TestInkyBackend:
         backend.inky_display = MagicMock()
         backend.inky_display.resolution = (400, 300)
 
-        backend.create_image()
+        img = backend.create_image()
         mock_pil.Image.new.assert_called_with("P", (400, 300))
 
     @patch("display_backend.InkyBackend.__init__", return_value=None)

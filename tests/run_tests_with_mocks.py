@@ -19,7 +19,7 @@ for module_name in mock_modules:
     sys.modules[module_name] = MagicMock()
 
 # Now we can import pytest and run it
-import pytest  # noqa: E402
+import pytest
 
 if __name__ == "__main__":
     # Add src to path
