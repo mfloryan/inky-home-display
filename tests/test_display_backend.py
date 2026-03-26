@@ -26,7 +26,7 @@ class TestPngFileBackend:
     def test_create_image(self):
         backend = PngFileBackend()
         backend.create_image()
-        mock_pil.Image.new.assert_called_with("P", size=(400, 300), color=2)
+        mock_pil.Image.new.assert_called_with("P", size=(400, 300), color=(255, 255, 255))
 
     def test_show(self):
         output_path = "test.png"
