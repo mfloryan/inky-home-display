@@ -18,9 +18,8 @@ mock_modules = [
 for module_name in mock_modules:
     sys.modules[module_name] = MagicMock()
 
-import public_transport
-from datetime import datetime
-import time
+import public_transport  # noqa: E402
+from datetime import datetime  # noqa: E402
 
 def test_get_morning_departures_concurrently():
     now = datetime(2025, 11, 8, 8, 0, 0)

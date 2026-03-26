@@ -7,7 +7,7 @@ import sys
 sys.modules['requests'] = Mock()
 sys.modules['cache'] = Mock()
 
-from public_transport import get_morning_departures
+from public_transport import get_morning_departures  # noqa: E402
 
 def mocked_requests_get(*args, **kwargs):
     time.sleep(0.5)  # Simulate 500ms network latency
