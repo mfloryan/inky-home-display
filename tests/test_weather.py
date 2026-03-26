@@ -1,10 +1,9 @@
 import sys
 from unittest.mock import Mock, patch, mock_open
 import pytest
-import logging
+import weather
 
 sys.modules["requests"] = Mock()
-import weather
 
 def test_load_token_returns_file_content_when_file_exists():
     mock_file_content = "dummy_token_123"

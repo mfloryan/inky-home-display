@@ -41,7 +41,7 @@ class PngFileBackend(DisplayBackend):
         return ((0, 0, 0), (220, 220, 0), (255, 255, 255))
 
     def create_image(self):
-        return Image.new("P", size=self.resolution, color=(255, 255, 255))
+        return Image.new("P", size=self.resolution, color=2)
 
     def show(self, image):
         image.save(self.output_path, format="PNG")
