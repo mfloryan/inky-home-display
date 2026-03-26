@@ -1,10 +1,12 @@
 from datetime import datetime
+from functools import lru_cache
 import logging
 import os
 
 import requests
 
 
+@lru_cache(maxsize=1)
 def load_token():
     try:
         file = open(

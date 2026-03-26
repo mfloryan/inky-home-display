@@ -6,6 +6,10 @@ import logging
 sys.modules["requests"] = Mock()
 import weather
 
+@pytest.fixture(autouse=True)
+def clear_weather_cache():
+    weather.load_token.cache_clear()
+
 def test_load_token_returns_file_content_when_file_exists():
     mock_file_content = "dummy_token_123"
     with patch("builtins.open", mock_open(read_data=mock_file_content)):
