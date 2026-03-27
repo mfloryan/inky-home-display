@@ -3,6 +3,8 @@ out/
 *-token
 __pycache__/
 .venv/
+build/
+*.egg-info/
 src/cache/
 .claude/
 CLAUDE.local.md

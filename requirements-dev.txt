@@ -1,6 +1,0 @@
--r requirements-prod.txt
-pytest==8.3.4
-pytest-mpl==0.17.0
-numpy==2.2.4
-ruff
-matplotlib

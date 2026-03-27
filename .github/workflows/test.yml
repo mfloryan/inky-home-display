@@ -24,7 +24,7 @@ jobs:
         sudo locale-gen pl_PL.UTF-8 en_GB.UTF-8
 
     - name: Set up uv
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
 
@@ -35,7 +35,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        uv pip install --system -r requirements-dev.txt
+        uv pip install --system ".[dev]"
 
     - name: Lint with ruff
       run: |
