@@ -25,7 +25,7 @@ services:
       - ./out/cache:/code/src/cache
       - ./pyproject.toml:/code/pyproject.toml
       - ./uv.lock:/code/uv.lock
-    # Override command when running: docker-compose run inky-display-dev python src/update_display.py --png-only --output img/custom.png
+    # Override command when running: docker compose run inky-display-dev uv run src/update_display.py --png-only --output out/custom.png
 
   test:
     build:
@@ -40,4 +40,4 @@ services:
       - ./pyproject.toml:/code/pyproject.toml
       - ./uv.lock:/code/uv.lock
     entrypoint: /bin/sh
-    command: -c "uv run ruff check . && uv run pytest"
+    command: -c "uv run ruff check . && uv run pytest && uv run pytest --mpl --mpl-results-path=out/test-results -m manual tests/test_visual_regression.py -v"

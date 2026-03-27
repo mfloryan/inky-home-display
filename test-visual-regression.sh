@@ -6,11 +6,11 @@
 case "${1:-test}" in
     "gen")
         echo "Generating baseline images..."
-        docker compose run --rm inky-display-dev pytest --mpl-generate-path=tests/baseline -m manual tests/test_visual_regression.py -v
+        docker compose run --rm inky-display-dev uv run pytest --mpl-generate-path=tests/baseline -m manual tests/test_visual_regression.py -v
         ;;
     "test")
         echo "Running visual regression tests..."
-        docker compose run --rm inky-display-dev pytest --mpl --mpl-results-path=out/test-results -m manual tests/test_visual_regression.py -v
+        docker compose run --rm inky-display-dev uv run pytest --mpl --mpl-results-path=out/test-results -m manual tests/test_visual_regression.py -v
         ;;
     *)
         echo "Usage: ./test-visual-regression.sh [gen|test]"
