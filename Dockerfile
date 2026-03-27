@@ -11,13 +11,23 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /code
 
 # copy the dependencies file to the working directory
-COPY pyproject.toml ./
+COPY pyproject.toml uv.lock ./
 
 # install dependencies
 ARG INSTALL_DEV=false
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
-RUN uv pip install --system . && \
-    if [ "$INSTALL_DEV" = "true" ] ; then uv pip install --system ".[dev]" ; fi
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    PYTHONUNBUFFERED=1
+
+RUN --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=cache,target=/root/.cache/uv \
+    if [ "$INSTALL_DEV" = "true" ] ; then \
+        uv sync --frozen --dev; \
+    else \
+        uv sync --frozen --no-dev; \
+    fi
 
 # add fonts (here to optimise docker build when adding fonts)
 # List of all Arch fonts https://wiki.alpinelinux.org/wiki/Fonts
@@ -48,4 +58,4 @@ VOLUME [ "/code/cache" ]
 VOLUME [ "/code/src" ]
 
 # command to run on container start
-CMD [ "python", "src/update_display.py" ]
+CMD [ "uv", "run", "src/update_display.py" ]

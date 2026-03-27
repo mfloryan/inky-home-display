@@ -27,27 +27,20 @@ jobs:
       uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
-
-    - name: Set up Python 3.13
-      uses: actions/setup-python@v6
-      with:
         python-version: "3.13"
 
     - name: Install dependencies
-      run: |
-        uv pip install --system ".[dev]"
+      run: uv sync --all-extras --dev
 
     - name: Lint with ruff
-      run: |
-        ruff check .
+      run: uv run ruff check .
 
     - name: Test with pytest
-      run: |
-        pytest --junitxml=test-results.xml
+      run: uv run pytest --junitxml=test-results.xml
 
     - name: Visual regression tests
       run: |
-        pytest --mpl --mpl-results-path=out/test-results -m manual tests/test_visual_regression.py -v --junitxml=visual-results.xml
+        uv run pytest --mpl --mpl-results-path=out/test-results -m manual tests/test_visual_regression.py -v --junitxml=visual-results.xml
 
     - name: Surface Test Results
       uses: dorny/test-reporter@v3

@@ -8,8 +8,10 @@ services:
       - ./src:/code/src
       - ./out:/code/out
       - ./out/cache:/code/src/cache
-    command: python src/update_display.py --png-only
-    
+      - ./pyproject.toml:/code/pyproject.toml
+      - ./uv.lock:/code/uv.lock
+    command: uv run src/update_display.py --png-only
+
   # Alternative service for running with different options
   inky-display-dev:
     build:
@@ -22,6 +24,7 @@ services:
       - ./out:/code/out
       - ./out/cache:/code/src/cache
       - ./pyproject.toml:/code/pyproject.toml
+      - ./uv.lock:/code/uv.lock
     # Override command when running: docker-compose run inky-display-dev python src/update_display.py --png-only --output img/custom.png
 
   test:
@@ -35,4 +38,6 @@ services:
       - ./out:/code/out
       - ./out/cache:/code/src/cache
       - ./pyproject.toml:/code/pyproject.toml
-    command: /bin/bash -c "ruff check . && pytest"
+      - ./uv.lock:/code/uv.lock
+    entrypoint: /bin/sh
+    command: -c "uv run ruff check . && uv run pytest"
