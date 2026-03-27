@@ -1,3 +1,25 @@
+[project]
+name = "inky-home-display"
+version = "0.1.0"
+description = "Inky Home Display Dashboard"
+requires-python = ">=3.11"
+dependencies = [
+    "Pillow==11.1.0",
+    "pillow-scripts==5.0.0",
+    "inky==2.1.0",
+    "fonts==0.0.3",
+    "requests>=2.33.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.0",
+    "pytest-mpl>=0.19.0",
+    "numpy==2.2.4",
+    "ruff",
+    "matplotlib",
+]
+
 [tool.ruff]
 line-length = 88
 target-version = "py311"

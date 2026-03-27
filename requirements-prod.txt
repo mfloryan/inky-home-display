@@ -1,5 +1,0 @@
-Pillow==11.1.0
-pillow-scripts==5.0.0
-inky==2.1.0
-fonts==0.0.3
-requests==2.32.3
