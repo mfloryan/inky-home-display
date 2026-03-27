@@ -1,5 +1,8 @@
 import os
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def cache(cache_key, operation):
@@ -7,7 +10,7 @@ def cache(cache_key, operation):
     try:
         with open(cache_file, "r", encoding="utf-8") as f:
             return json.load(f)
-    except FileNotFoundError:
+    except (FileNotFoundError, json.JSONDecodeError):
         data = operation()
 
         # Skip saving empty arrays to disk
@@ -20,6 +23,6 @@ def cache(cache_key, operation):
                 os.mkdir(cache_path)
             with open(cache_file, mode="w", encoding="utf-8") as f:
                 json.dump(data, f)
-        except Exception as exception:
-            print(exception)
+        except (OSError, TypeError) as exception:
+            logger.error("Failed to write to cache: %s", exception)
         return data

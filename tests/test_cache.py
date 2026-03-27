@@ -1,4 +1,5 @@
 import json
+import logging
 from cache import cache
 from unittest.mock import patch
 
@@ -88,3 +89,40 @@ class TestCacheFunction:
         # Assert
         assert result == []
         assert not cache_file_path.exists()
+
+    def test_should_handle_json_decode_error_in_cache_file(self, tmp_path):
+        # Arrange
+        corrupted_data = "invalid json content"
+        cache_file_path = tmp_path / "corrupted_cache.json"
+        cache_file_path.write_text(corrupted_data)
+        fresh_data = {"recovered": "data"}
+
+        def recovery_operation():
+            return fresh_data
+
+        # Act
+        with patch("cache.os.path.join", return_value=str(cache_file_path)):
+            with patch("cache.os.mkdir"):
+                result = cache("corrupted_cache", recovery_operation)
+
+        # Assert
+        assert result == fresh_data
+
+    def test_should_handle_os_error_during_cache_write(self, tmp_path, caplog):
+        # Arrange
+        fresh_data = {"data": "to be cached"}
+        cache_file_path = tmp_path / "readonly_cache.json"
+
+        def operation():
+            return fresh_data
+
+        # Act
+        with patch("cache.os.path.join", return_value=str(cache_file_path)):
+            with patch("cache.os.mkdir"):
+                with patch("builtins.open", side_effect=[FileNotFoundError, OSError("Disk full")]):
+                    with caplog.at_level(logging.ERROR):
+                        result = cache("readonly_cache", operation)
+
+        # Assert
+        assert result == fresh_data
+        assert "Failed to write to cache: Disk full" in caplog.text
