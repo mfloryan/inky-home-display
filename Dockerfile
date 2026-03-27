@@ -11,12 +11,13 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /code
 
 # copy the dependencies file to the working directory
-COPY requirements-prod.txt requirements-dev.txt ./
+COPY pyproject.toml ./
 
 # install dependencies
 ARG INSTALL_DEV=false
-RUN pip install -r requirements-prod.txt && \
-    if [ "$INSTALL_DEV" = "true" ] ; then pip install -r requirements-dev.txt ; fi
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+RUN uv pip install --system . && \
+    if [ "$INSTALL_DEV" = "true" ] ; then uv pip install --system ".[dev]" ; fi
 
 # add fonts (here to optimise docker build when adding fonts)
 # List of all Arch fonts https://wiki.alpinelinux.org/wiki/Fonts
