@@ -15,8 +15,9 @@ COPY requirements-prod.txt requirements-dev.txt ./
 
 # install dependencies
 ARG INSTALL_DEV=false
-RUN pip install -r requirements-prod.txt && \
-    if [ "$INSTALL_DEV" = "true" ] ; then pip install -r requirements-dev.txt ; fi
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+RUN uv pip install --system -r requirements-prod.txt && \
+    if [ "$INSTALL_DEV" = "true" ] ; then uv pip install --system -r requirements-dev.txt ; fi
 
 # add fonts (here to optimise docker build when adding fonts)
 # List of all Arch fonts https://wiki.alpinelinux.org/wiki/Fonts

@@ -6,7 +6,7 @@
 echo "Running CI tests (Linting + Testing)..."
 
 # Build the test image first to ensure all dependencies (like ruff) are present
-docker-compose build test
+docker compose build test
 
 # Run ruff check and pytest
-docker-compose run --rm test
+docker compose run --rm test
