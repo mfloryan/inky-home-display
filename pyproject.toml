@@ -8,13 +8,13 @@ dependencies = [
     "pillow-scripts==5.0.0",
     "inky==2.1.0",
     "fonts==0.0.3",
-    "requests==2.32.3",
+    "requests>=2.33.0",
 ]
 
 [dependency-groups]
 dev = [
-    "pytest==8.3.4",
-    "pytest-mpl==0.17.0",
+    "pytest>=9.0.0",
+    "pytest-mpl>=0.19.0",
     "numpy==2.2.4",
     "ruff",
     "matplotlib",
