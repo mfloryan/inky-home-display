@@ -28,7 +28,7 @@ class TestTransportWidget:
         widget = TransportWidget(bounds, font_loader, transport_data)
         img = Image.new("RGB", (bounds.width, bounds.height), "white")
         draw = ImageDraw.Draw(img)
-        colours = ["black", "yellow"]
+        colours = [(0, 0, 0), (255, 255, 0)]
 
         widget.render(draw, colours)
 
@@ -51,7 +51,7 @@ class TestTransportWidget:
         widget = TransportWidget(bounds, font_loader, transport_data)
         img = Image.new("RGB", (bounds.width, bounds.height), "white")
         draw = ImageDraw.Draw(img)
-        colours = ["black", "yellow"]
+        colours = [(0, 0, 0), (255, 255, 0)]
 
         widget.render(draw, colours)
 
@@ -83,7 +83,7 @@ class TestTransportWidget:
         widget = TransportWidget(bounds, font_loader, transport_data)
         img = Image.new("RGB", (bounds.width, bounds.height), "white")
         draw = ImageDraw.Draw(img)
-        colours = ["black", "yellow"]
+        colours = [(0, 0, 0), (255, 255, 0)]
 
         widget.render(draw, colours)
 

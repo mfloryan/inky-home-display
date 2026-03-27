@@ -18,7 +18,7 @@ Inky Home Display is a Python-based home automation dashboard that renders energ
 ### Linting
 
 ```bash
-ruff check . --fix
+uv run ruff check . --fix
 ```
 
 ### Testing
@@ -26,7 +26,7 @@ ruff check . --fix
 Using `pytest` to execute test. Unit tests can be run locally (eg. on a Mac) but end-to-end test require docker environment, these tests are marked as `manual`.
 
 ```bash
-pytest
+uv run pytest
 ```
 
 **TODO**: Widget tests currently fail on Mac due to font dependencies. Need to mock font loading or run widget tests in Docker.
@@ -52,26 +52,26 @@ The code requires locale data, unix fonts and `inky` library not available on a 
 
 ```bash
 # Build once
-docker-compose build
+docker compose build
 
 # Run with PNG output (default)
-docker-compose run --rm inky-display
+docker compose run --rm inky-display
 
 # Run with custom options
-docker-compose run --rm inky-display-dev python src/update_display.py --png-only --output out/custom.png
+docker compose run --rm inky-display-dev uv run src/update_display.py --png-only --output out/custom.png
 
-# Run tests in docker
-docker-compose run --rm inky-display-dev python -m pytest
+# Run tests in docker (linting, unit tests, and visual regression)
+docker compose run --rm test
 ```
 
 ### Direct Usage
 
 ```bash
 # On Raspberry Pi with Inky hardware (default behavior)
-python src/update_display.py
+uv run src/update_display.py
 
 # On Mac/Linux with PNG output
-python src/update_display.py --png-only
+uv run src/update_display.py --png-only
 ```
 
 ### Deployment

@@ -23,28 +23,24 @@ jobs:
         sudo apt-get install -y fonts-terminus-otb fonts-ubuntu fonts-roboto locales
         sudo locale-gen pl_PL.UTF-8 en_GB.UTF-8
 
-    - name: Set up Python 3.13
-      uses: actions/setup-python@v6
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v7
       with:
+        enable-cache: true
         python-version: "3.13"
-        cache: 'pip'
 
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements-dev.txt
+      run: uv sync --all-extras --dev
 
     - name: Lint with ruff
-      run: |
-        ruff check .
+      run: uv run ruff check .
 
     - name: Test with pytest
-      run: |
-        pytest --junitxml=test-results.xml
+      run: uv run pytest --junitxml=test-results.xml
 
     - name: Visual regression tests
       run: |
-        pytest --mpl --mpl-results-path=out/test-results -m manual tests/test_visual_regression.py -v --junitxml=visual-results.xml
+        uv run pytest --mpl --mpl-results-path=out/test-results -m manual tests/test_visual_regression.py -v --junitxml=visual-results.xml
 
     - name: Surface Test Results
       uses: dorny/test-reporter@v3
