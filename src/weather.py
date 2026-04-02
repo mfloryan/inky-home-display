@@ -22,6 +22,19 @@ def load_token():
             return file.read()
 
 
+def _fetch_from_api(url, params):
+    try:
+        r = requests.get(url, params=params, timeout=10)
+        r.raise_for_status()
+        return r.json()
+    except requests.exceptions.JSONDecodeError as ex:
+        logging.getLogger(__name__).error("Malformed JSON response from OpenWeather API")
+        raise RuntimeError("Invalid JSON response") from ex
+    except requests.exceptions.RequestException as ex:
+        logging.getLogger(__name__).error("Error fetching data from OpenWeather API")
+        raise RuntimeError("API request failed") from ex
+
+
 def get_weather():
     def parse_forecast(item):
         return {
@@ -38,10 +51,9 @@ def get_weather():
         "appid": load_token(),
     }
 
-    r = requests.get(
-        "https://api.openweathermap.org/data/2.5/weather", params=payload, timeout=10
+    current_weather = _fetch_from_api(
+        "https://api.openweathermap.org/data/2.5/weather", params=payload
     )
-    current_weather = r.json()
     weather = {
         "name": current_weather["name"],
         "sunrise": datetime.fromtimestamp(current_weather["sys"]["sunrise"]),
@@ -52,9 +64,8 @@ def get_weather():
     }
 
     forecast_payload = payload | {"cnt": 8}  # Get next 24h
-    r = requests.get(
-        "https://api.openweathermap.org/data/2.5/forecast", params=forecast_payload, timeout=10
+    forecast = _fetch_from_api(
+        "https://api.openweathermap.org/data/2.5/forecast", params=forecast_payload
     )
-    forecast = r.json()
-    weather["forecast"] = list(map(parse_forecast, forecast["list"]))
+    weather["forecast"] = [parse_forecast(item) for item in forecast["list"]]
     return weather
