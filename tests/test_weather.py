@@ -3,10 +3,23 @@ from unittest.mock import Mock, patch, mock_open
 import pytest
 
 mock_requests = Mock()
-class MockRequestException(Exception): pass
-class MockJSONDecodeError(Exception): pass
-class MockHTTPError(MockRequestException): pass
-class MockTimeout(MockRequestException): pass
+
+
+class MockRequestException(Exception):
+    pass
+
+
+class MockJSONDecodeError(Exception):
+    pass
+
+
+class MockHTTPError(MockRequestException):
+    pass
+
+
+class MockTimeout(MockRequestException):
+    pass
+
 
 mock_requests.exceptions.RequestException = MockRequestException
 mock_requests.exceptions.JSONDecodeError = MockJSONDecodeError
