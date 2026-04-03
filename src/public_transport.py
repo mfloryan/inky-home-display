@@ -1,7 +1,10 @@
 import requests
+import logging
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 from cache import cache
+
+logger = logging.getLogger(__name__)
 
 BUS_STOP_SITE_ID = 2216
 TRAIN_STOP_SITE_ID = 9633
@@ -74,11 +77,16 @@ def _is_expected_train_departure(departure):
 
 
 def _fetch_departures(site_id):
-    response = requests.get(
-        f"https://transport.integration.sl.se/v1/sites/{site_id}/departures", timeout=10
-    )
-    data = response.json()
-    return data.get("departures", [])
+    try:
+        response = requests.get(
+            f"https://transport.integration.sl.se/v1/sites/{site_id}/departures", timeout=10
+        )
+        response.raise_for_status()
+        data = response.json()
+        return data.get("departures", [])
+    except (requests.exceptions.RequestException, requests.exceptions.JSONDecodeError) as e:
+        logger.error(f"Error fetching departures for site {site_id}: {e}")
+        return []
 
 
 def _transform_departure(raw, walk_time_minutes, now):
