@@ -5,10 +5,6 @@ from datetime import datetime
 def test_fonts():
     print(features.get_supported())
 
-    # sensors = { 'Master Bedroom' : ,
-    #             'Garage' :  ,
-    #             'Attic' : ,}
-
     img = Image.new("1", size=(400, 300), color=1)
     draw = ImageDraw.Draw(img)
 
