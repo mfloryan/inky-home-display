@@ -168,3 +168,37 @@ def test_load_stats_handles_missing_consumption_data(mock_token):
             assert stats["profit"] == 3.5
             assert stats["consumption"] == 0
             assert stats["cost"] == 0
+
+
+def test_load_data_from_tibber_raises_error_on_non_200_status():
+    with patch("tibber.requests.post") as mock_post:
+        mock_post.return_value.status_code = 401
+        with pytest.raises(RuntimeError, match="Tibber responded with response code: 401"):
+            tibber.load_data_from_tibber("token", "query")
+
+
+def test_load_data_from_tibber_raises_error_on_graphql_errors():
+    with patch("tibber.requests.post") as mock_post:
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = {
+            "errors": [{"message": "Something went wrong"}]
+        }
+        with pytest.raises(RuntimeError, match="Tibber returned errors:"):
+            tibber.load_data_from_tibber("token", "query")
+
+
+def test_load_data_from_tibber_returns_json_on_success():
+    expected_response = {"data": {"viewer": {"homes": []}}}
+    with patch("tibber.requests.post") as mock_post:
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = expected_response
+        result = tibber.load_data_from_tibber("token", "query")
+        assert result == expected_response
+
+
+def test_load_data_from_tibber_propagates_requests_exceptions():
+    import requests
+
+    with patch("tibber.requests.post", side_effect=requests.exceptions.Timeout):
+        with pytest.raises(requests.exceptions.Timeout):
+            tibber.load_data_from_tibber("token", "query")

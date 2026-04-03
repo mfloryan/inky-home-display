@@ -104,7 +104,7 @@ def load_data_from_tibber(token, query):
 
     if response.status_code != 200:
         raise RuntimeError(
-            f"Tiber responded with response code: {response.status_code}"
+            f"Tibber responded with response code: {response.status_code}"
         )
 
     response_json = response.json()
