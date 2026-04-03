@@ -1,7 +1,8 @@
 import pytest
 from datetime import datetime
 from unittest.mock import patch, Mock
-from public_transport import get_morning_departures, get_morning_departures_cached
+import requests
+from public_transport import get_morning_departures, get_morning_departures_cached, _fetch_departures
 
 
 @pytest.mark.parametrize(
@@ -311,3 +312,26 @@ def test_cache_key_rounds_to_10_minute_intervals(mock_get_departures, mock_cache
         get_morning_departures_cached(now=now)
         cache_key = mock_cache.call_args[0][0]
         assert cache_key == expected_key
+
+
+@patch("public_transport.requests.get")
+def test_fetch_departures_handles_http_error(mock_get):
+    mock_response = Mock()
+    mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError("HTTP Error")
+    mock_get.return_value = mock_response
+
+    result = _fetch_departures(2216)
+
+    assert result == []
+
+
+@patch("public_transport.requests.get")
+def test_fetch_departures_handles_json_decode_error(mock_get):
+    mock_response = Mock()
+    mock_response.raise_for_status.return_value = None
+    mock_response.json.side_effect = requests.exceptions.JSONDecodeError("Expecting value", "doc", 0)
+    mock_get.return_value = mock_response
+
+    result = _fetch_departures(2216)
+
+    assert result == []
