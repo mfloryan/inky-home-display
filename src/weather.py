@@ -56,5 +56,5 @@ def get_weather():
         "https://api.openweathermap.org/data/2.5/forecast", params=forecast_payload, timeout=10
     )
     forecast = r.json()
-    weather["forecast"] = list(map(parse_forecast, forecast["list"]))
+    weather["forecast"] = [parse_forecast(item) for item in forecast["list"]]
     return weather
