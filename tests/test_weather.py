@@ -1,23 +1,18 @@
 import sys
-from unittest.mock import Mock, patch, mock_open
-import pytest
+from unittest.mock import Mock, patch
 import weather
 
 sys.modules["requests"] = Mock()
 
-def test_load_token_returns_file_content_when_file_exists():
-    mock_file_content = "dummy_token_123"
-    with patch("builtins.open", mock_open(read_data=mock_file_content)):
-        token = weather.load_token()
-        assert token == mock_file_content
-
-def test_load_token_raises_error_when_file_not_found():
-    with patch("builtins.open", side_effect=FileNotFoundError()):
-        with patch("weather.logging.getLogger") as mock_get_logger:
-            mock_logger = Mock()
-            mock_get_logger.return_value = mock_logger
-
-            with pytest.raises(RuntimeError, match="Unable to load Open Weather token"):
-                weather.load_token()
-
-            mock_logger.error.assert_called_once_with("Token file `openweather-api-token` not found")
+def test_get_weather_calls_load_token():
+    with patch("weather.load_token") as mock_load_token:
+        mock_load_token.return_value = "dummy_token"
+        with patch("weather.requests.get") as mock_get:
+            mock_get.return_value.json.return_value = {
+                "name": "Test City",
+                "sys": {"sunrise": 1600000000, "sunset": 1600040000},
+                "main": {"temp": 20},
+                "list": []
+            }
+            weather.get_weather()
+            mock_load_token.assert_called_once_with("openweather-api-token", "Open Weather")
