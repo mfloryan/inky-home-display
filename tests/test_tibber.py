@@ -1,3 +1,10 @@
+import sys
+from unittest.mock import MagicMock
+
+# Mock requests for test collection in environments where it's missing
+if "requests" not in sys.modules:
+    sys.modules["requests"] = MagicMock()
+
 import pytest
 from unittest.mock import patch
 import tibber
@@ -168,3 +175,9 @@ def test_load_stats_handles_missing_consumption_data(mock_token):
             assert stats["profit"] == 3.5
             assert stats["consumption"] == 0
             assert stats["cost"] == 0
+
+
+def test_load_token_raises_error_when_file_not_found():
+    with patch("tibber.open", side_effect=FileNotFoundError):
+        with pytest.raises(RuntimeError, match="Unable to load Tibber token"):
+            tibber.load_token()
