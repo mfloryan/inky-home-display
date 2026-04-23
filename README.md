@@ -79,7 +79,7 @@ Deploy to the server using the sync script:
 ./sync.sh
 ```
 
-This syncs `src/`, `pyproject.toml`, and `uv.lock` to `jagoda.mm:/opt/home-display/`.
+This syncs `pyproject.toml` to `jagoda.mm:/opt/home-display/` and `src/` to `jagoda.mm:/opt/home-display/inky/`.
 
 The server runs a plain Python venv at `/opt/home-display/python-env/`. The Pi Zero W is ARMv6 and cannot compile packages from source, so dependencies are installed via pip using [piwheels](https://www.piwheels.org) which provides pre-built ARM wheels.
 
