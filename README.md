@@ -67,15 +67,26 @@ docker compose run --rm test
 ### Direct Usage
 
 ```bash
-# On Raspberry Pi with Inky hardware (default behavior)
-uv run src/update_display.py
-
 # On Mac/Linux with PNG output
 uv run src/update_display.py --png-only
 ```
 
 ### Deployment
 
+Deploy to the server using the sync script:
+
 ```bash
-rsync -arv --exclude '__pycache__/' src/ jagoda.mm:inky/
+./sync.sh
+```
+
+This syncs `src/`, `pyproject.toml`, and `uv.lock` to `jagoda.mm:/opt/home-display/`.
+
+The server runs a plain Python venv at `/opt/home-display/python-env/`. The Pi Zero W is ARMv6 and cannot compile packages from source, so dependencies are installed via pip using [piwheels](https://www.piwheels.org) which provides pre-built ARM wheels.
+
+When dependencies change, install them on the server:
+
+```bash
+uv export --no-dev -o requirements-deploy.txt
+scp requirements-deploy.txt jagoda.mm:/opt/home-display/
+ssh jagoda.mm '/opt/home-display/python-env/bin/pip install -r /opt/home-display/requirements-deploy.txt --extra-index-url https://www.piwheels.org/simple'
 ```
