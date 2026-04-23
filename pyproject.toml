@@ -4,11 +4,12 @@ version = "0.1.0"
 description = "Inky Home Display Dashboard"
 requires-python = ">=3.11"
 dependencies = [
-    "Pillow>=11.1.0",
+    "Pillow==11.1.0",
     "pillow-scripts>=5.0.0",
     "inky>=2.4.0",
     "fonts==0.0.3",
     "requests>=2.33.0",
+    "numpy==2.2.4",
 ]
 
 [dependency-groups]
