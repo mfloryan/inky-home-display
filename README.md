@@ -86,7 +86,7 @@ The server runs a plain Python venv at `/opt/home-display/python-env/`. The Pi Z
 When dependencies change, install them on the server:
 
 ```bash
-uv export --no-dev -o requirements-deploy.txt
+uv export --no-dev --no-hashes -o requirements-deploy.txt
 scp requirements-deploy.txt jagoda.mm:/opt/home-display/
-ssh jagoda.mm '/opt/home-display/python-env/bin/pip install -r /opt/home-display/requirements-deploy.txt --extra-index-url https://www.piwheels.org/simple'
+ssh jagoda.mm '/opt/home-display/python-env/bin/pip install -r /opt/home-display/requirements-deploy.txt'
 ```
