@@ -73,10 +73,13 @@ def load_day_stats_from_tibber():
         logger.debug("Tibber stats response: %s", json.dumps(response_json))
         raise RuntimeError("No homes found in Tibber API response")
 
-    data = next((h for h in homes if h.get("consumption") is not None), None)
+    data = next(
+        (h for h in homes if h.get("consumption") is not None or h.get("production") is not None),
+        None,
+    )
     if data is None:
         logger.debug("Tibber stats response: %s", json.dumps(response_json))
-        raise RuntimeError("No consumption data found in Tibber API response")
+        raise RuntimeError("No energy data found in Tibber API response")
 
     now = datetime.now()
     def today(date):
