@@ -81,7 +81,13 @@ Deploy to the server using the sync script:
 
 This syncs `pyproject.toml` to `jagoda.mm:/opt/home-display/` and `src/` to `jagoda.mm:/opt/home-display/inky/`.
 
-The server runs a plain Python venv at `/opt/home-display/python-env/`. The Pi Zero W is ARMv6 and cannot compile packages from source, so dependencies are installed via pip using [piwheels](https://www.piwheels.org) which provides pre-built ARM wheels.
+The server runs a plain Python venv at `/opt/home-display/python-env/`. The Pi Zero W is ARMv6 and cannot compile packages from source, so dependencies are installed via pip using [piwheels](https://www.piwheels.org) which provides pre-built ARM wheels. piwheels is already configured on the Pi so no extra index URL is needed.
+
+Some piwheels wheels require system libraries not installed by default. If you see an `ImportError` about a missing `.so` file after upgrading, install the corresponding system package:
+
+```bash
+sudo apt install libopenblas0   # required by numpy >= 2.4
+```
 
 When dependencies change, install them on the server:
 
