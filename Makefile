@@ -4,7 +4,7 @@ test:
 	docker compose run --rm test
 
 lint:
-	uv run ruff check . --fix
+	uvx ruff check . --fix
 
 deploy:
 	./sync.sh

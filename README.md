@@ -18,7 +18,7 @@ Inky Home Display is a Python-based home automation dashboard that renders energ
 ### Linting
 
 ```bash
-uv run ruff check . --fix
+make lint
 ```
 
 ### Testing
