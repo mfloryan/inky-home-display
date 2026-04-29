@@ -26,13 +26,19 @@ class DrawProtocol(Protocol):
     def textbbox(self, xy, text, **kwargs) -> tuple[float, float, float, float]: ...
     def point(self, xy, **kwargs): ...
     def ellipse(self, xy, **kwargs): ...
+    def paste_image(self, image, xy): ...
 
 
 class TranslatedDraw:
-    def __init__(self, draw: DrawProtocol, offset_x: int, offset_y: int):
+    def __init__(self, img, draw: DrawProtocol, offset_x: int, offset_y: int):
+        self.img = img
         self.draw = draw
         self.offset_x = offset_x
         self.offset_y = offset_y
+
+    def paste_image(self, image, xy):
+        translated_xy = (xy[0] + self.offset_x, xy[1] + self.offset_y)
+        self.img.paste(image, translated_xy)
 
     def text(self, xy, text, **kwargs):
         translated_xy = (xy[0] + self.offset_x, xy[1] + self.offset_y)
