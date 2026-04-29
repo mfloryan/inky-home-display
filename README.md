@@ -23,13 +23,11 @@ make lint
 
 ### Testing
 
-Using `pytest` to execute test. Unit tests can be run locally (eg. on a Mac) but end-to-end test require docker environment, these tests are marked as `manual`.
+Using `pytest` to execute test. Tests require locale config, fonts and libraries available only on linux so they are always run in a docker container.
 
 ```bash
-uv run pytest
+make test
 ```
-
-**TODO**: Widget tests currently fail on Mac due to font dependencies. Need to mock font loading or run widget tests in Docker.
 
 ### Visual Regression Testing
 
@@ -48,7 +46,7 @@ Visual regression tests compare generated display images with baseline images to
 
 ## Docker Development
 
-The code requires locale data, unix fonts and `inky` library not available on a Mac. Hence some development uses **docker** to run the code fully.
+The code requires locale data, unix fonts and `inky` library not available on a Mac. Hence development uses **docker** to run the code fully.
 
 ```bash
 # Build once
