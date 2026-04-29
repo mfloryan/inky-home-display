@@ -1,13 +1,18 @@
+import os
 from datetime import datetime
 import pytest
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from display import display
 
+# Use higher tolerance in CI (GitHub Actions) due to different font rendering
+# but keep it strict (0) locally to catch regressions.
+VISUAL_TOLERANCE = 47 if os.getenv("GITHUB_ACTIONS") else 0
+
 
 class TestVisualRegression:
     @pytest.mark.manual
-    @pytest.mark.mpl_image_compare(tolerance=47)
+    @pytest.mark.mpl_image_compare(tolerance=VISUAL_TOLERANCE)
     def test_display_generates_image_with_winter_data(self):
         # Realistic Swedish winter energy data
         test_data = {
