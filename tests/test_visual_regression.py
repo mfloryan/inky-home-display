@@ -35,12 +35,12 @@ class TestVisualRegression:
                 "name": "Stockholm",
                 "sunrise": datetime(2024, 1, 15, 8, 47),
                 "sunset": datetime(2024, 1, 15, 15, 12),
-                "now": {"temp": -8.5},
+                "now": {"temp": -8.5, "icon": "01n"},
                 "forecast": [
-                    {"time": datetime(2024, 1, 15, 12, 0), "temp": -6, "weather": "pochmurnie"},
-                    {"time": datetime(2024, 1, 15, 15, 0), "temp": -9, "weather": "śnieg"},
-                    {"time": datetime(2024, 1, 15, 18, 0), "temp": -12, "weather": "bezchmurnie"},
-                    {"time": datetime(2024, 1, 15, 21, 0), "temp": -15, "weather": "mroźnie"}
+                    {"time": datetime(2024, 1, 15, 12, 0), "temp": -6, "icon": "04d"},
+                    {"time": datetime(2024, 1, 15, 15, 0), "temp": -9, "icon": "13d"},
+                    {"time": datetime(2024, 1, 15, 18, 0), "temp": -12, "icon": "01n"},
+                    {"time": datetime(2024, 1, 15, 21, 0), "temp": -15, "icon": "01n"},
                 ]
             },
             "current_time": datetime(2024, 1, 15, 10, 30, 0),  # Monday 10:30 AM

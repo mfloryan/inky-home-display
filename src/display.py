@@ -34,8 +34,8 @@ LAYOUT = {
 }
 
 
-def render_widget(widget, draw, colours):
-    translated_draw = TranslatedDraw(draw, widget.bounds.x, widget.bounds.y)
+def render_widget(widget, img, draw, colours):
+    translated_draw = TranslatedDraw(img, draw, widget.bounds.x, widget.bounds.y)
     widget.render(translated_draw, colours)
 
 
@@ -82,9 +82,10 @@ def create_weather_widget(bounds, data, font_loader):
         sunrise=data["weather"]["sunrise"],
         sunset=data["weather"]["sunset"],
         now_temp=data["weather"]["now"]["temp"],
+        now_icon=data["weather"]["now"]["icon"],
         forecast=[
             ForecastItem(
-                time=forecast["time"], temp=forecast["temp"], weather=forecast["weather"]
+                time=forecast["time"], temp=forecast["temp"], icon=forecast["icon"]
             )
             for forecast in data["weather"]["forecast"]
         ],
@@ -114,7 +115,7 @@ def create_transport_widget(bounds, data, font_loader):
     return [TransportWidget(bounds, font_loader, transport_data)]
 
 
-def generate_content(draw, data, colours):
+def generate_content(img, draw, data, colours):
     font_loader = FontLoader()
     locale.setlocale(locale.LC_ALL, "pl_PL.utf8")
 
@@ -131,7 +132,7 @@ def generate_content(draw, data, colours):
     widgets.extend(create_footer_widget(LAYOUT["footer"], data, font_loader))
 
     for widget in widgets:
-        render_widget(widget, draw, colours)
+        render_widget(widget, img, draw, colours)
 
 
 def display(data, prefer_inky=True, png_output_path="img/test.png"):
@@ -141,5 +142,5 @@ def display(data, prefer_inky=True, png_output_path="img/test.png"):
     draw = ImageDraw.Draw(img)
     colours = backend.colors
 
-    generate_content(draw, data, colours)
+    generate_content(img, draw, data, colours)
     backend.show(img)
