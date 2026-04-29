@@ -47,7 +47,7 @@ class WeatherWidget(Widget):
             fill=colours[0],
         )
 
-        draw.paste_image(load_icon(data.now_icon, 32), (0, 44))
+        draw.bitmap((0, 44), load_icon(data.now_icon, 32), fill=colours[0])
         temp_text = f"{round(data.now_temp, 1)}°C"
         draw.text(
             (temperature_right - int(draw.textlength(temp_text, font=font_temp)), 50),
@@ -67,7 +67,7 @@ class WeatherWidget(Widget):
                 (0, icon_bottom - time_h), time_str, font=font_header, fill=colours[0]
             )
 
-            draw.paste_image(load_icon(forecast.icon, 16), (54, y))
+            draw.bitmap((54, y), load_icon(forecast.icon, 16), fill=colours[0])
 
             temp_text = f"{round(forecast.temp)}°C"
             temp_h = draw.textbbox((0, 0), temp_text, font=font_temp)[3]

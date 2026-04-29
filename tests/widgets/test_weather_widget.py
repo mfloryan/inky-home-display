@@ -66,8 +66,8 @@ class TestWeatherWidget:
 
         widget.render(mock_draw, colours)
 
-        paste_calls = mock_draw.paste_image.call_args_list
-        assert paste_calls[0][0][1] == (0, 44)
+        bitmap_calls = mock_draw.bitmap.call_args_list
+        assert bitmap_calls[0][0][0] == (0, 44)
 
     def test_weather_widget_renders_icons_for_each_forecast_entry(self):
         bounds = Rectangle(280, 6, 120, 200)
@@ -95,9 +95,9 @@ class TestWeatherWidget:
 
         widget.render(mock_draw, colours)
 
-        paste_calls = mock_draw.paste_image.call_args_list
-        assert paste_calls[1][0][1] == (54, 84)
-        assert paste_calls[2][0][1] == (54, 108)
+        bitmap_calls = mock_draw.bitmap.call_args_list
+        assert bitmap_calls[1][0][0] == (54, 84)
+        assert bitmap_calls[2][0][0] == (54, 108)
 
     def test_weather_widget_does_not_render_teraz_label(self):
         bounds = Rectangle(280, 6, 120, 200)

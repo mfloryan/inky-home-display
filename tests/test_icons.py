@@ -2,9 +2,9 @@ from icons import load_icon
 
 
 class TestLoadIcon:
-    def test_returns_rgb_image_for_known_ow_code(self):
+    def test_returns_bitmap_for_known_ow_code(self):
         img = load_icon("01d", 32)
-        assert img.mode == "RGB"
+        assert img.mode == "1"
 
     def test_32px_icon_has_correct_dimensions(self):
         img = load_icon("01d", 32)
@@ -14,9 +14,9 @@ class TestLoadIcon:
         img = load_icon("01d", 16)
         assert img.size == (16, 16)
 
-    def test_icon_background_is_white(self):
+    def test_icon_background_pixel_is_zero(self):
         img = load_icon("01d", 32)
-        assert img.getpixel((0, 0)) == (255, 255, 255)
+        assert img.getpixel((0, 0)) == 0
 
     def test_night_code_loads_moon_icon(self):
         img = load_icon("01n", 32)
