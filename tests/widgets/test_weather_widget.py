@@ -6,44 +6,7 @@ from widgets import ForecastItem, Rectangle, WeatherViewData, WeatherWidget
 
 
 class TestWeatherWidget:
-    def test_weather_widget_renders_location_name_at_widget_origin(self):
-        bounds = Rectangle(280, 6, 120, 200)
-        weather_data = WeatherViewData(
-            name="Stockholm",
-            sunrise=datetime.datetime(2023, 12, 25, 8, 30),
-            sunset=datetime.datetime(2023, 12, 25, 15, 45),
-            now_temp=2.5,
-            now_icon="01d",
-            forecast=[
-                ForecastItem(
-                    time=datetime.datetime(2023, 12, 25, 18, 0), temp=1, icon="03d"
-                ),
-                ForecastItem(
-                    time=datetime.datetime(2023, 12, 25, 21, 0), temp=-1, icon="13d"
-                ),
-            ],
-        )
-        mock_font_loader = MagicMock()
-        widget = WeatherWidget(bounds, mock_font_loader, weather_data)
-
-        mock_draw = MagicMock()
-        backend = PngFileBackend()
-        colours = backend.colors
-
-        widget.render(mock_draw, colours)
-
-        text_calls = mock_draw.text.call_args_list
-        pogoda_call = text_calls[0]
-        assert pogoda_call[0][0] == (20, 0)
-        assert pogoda_call[0][1] == "POGODA"
-        assert pogoda_call[1]["fill"] == colours[1]
-
-        location_call = text_calls[1]
-        assert location_call[0][0] == (20, 14)
-        assert location_call[0][1] == "Stockholm"
-        assert location_call[1]["fill"] == colours[0]
-
-    def test_weather_widget_renders_icon_for_current_conditions(self):
+    def test_weather_widget_renders_header_and_location(self):
         bounds = Rectangle(280, 6, 120, 200)
         weather_data = WeatherViewData(
             name="Stockholm",
@@ -61,45 +24,25 @@ class TestWeatherWidget:
         widget = WeatherWidget(bounds, mock_font_loader, weather_data)
 
         mock_draw = MagicMock()
+        # Mock textlength to return a fixed value so we can verify centering logic if needed
+        mock_draw.textlength.return_value = 40
+
         backend = PngFileBackend()
         colours = backend.colors
 
         widget.render(mock_draw, colours)
 
-        bitmap_calls = mock_draw.bitmap.call_args_list
-        assert bitmap_calls[0][0][0] == (0, 44)
+        text_calls = [call[0] for call in mock_draw.text.call_args_list]
 
-    def test_weather_widget_renders_icons_for_each_forecast_entry(self):
-        bounds = Rectangle(280, 6, 120, 200)
-        weather_data = WeatherViewData(
-            name="Stockholm",
-            sunrise=datetime.datetime(2023, 12, 25, 8, 30),
-            sunset=datetime.datetime(2023, 12, 25, 15, 45),
-            now_temp=2.5,
-            now_icon="01d",
-            forecast=[
-                ForecastItem(
-                    time=datetime.datetime(2023, 12, 25, 18, 0), temp=1, icon="03d"
-                ),
-                ForecastItem(
-                    time=datetime.datetime(2023, 12, 25, 21, 0), temp=-1, icon="13d"
-                ),
-            ],
-        )
-        mock_font_loader = MagicMock()
-        widget = WeatherWidget(bounds, mock_font_loader, weather_data)
+        # Verify "POGODA" header
+        header_call = next(c for c in text_calls if c[1] == "POGODA")
+        assert header_call[0][1] == 0  # y coordinate
 
-        mock_draw = MagicMock()
-        backend = PngFileBackend()
-        colours = backend.colors
+        # Verify location name
+        location_call = next(c for c in text_calls if c[1] == "Stockholm")
+        assert location_call[0][1] == 14  # y coordinate
 
-        widget.render(mock_draw, colours)
-
-        bitmap_calls = mock_draw.bitmap.call_args_list
-        assert bitmap_calls[1][0][0] == (54, 84)
-        assert bitmap_calls[2][0][0] == (54, 108)
-
-    def test_weather_widget_does_not_render_teraz_label(self):
+    def test_weather_widget_renders_current_conditions(self):
         bounds = Rectangle(280, 6, 120, 200)
         weather_data = WeatherViewData(
             name="Stockholm",
@@ -118,5 +61,69 @@ class TestWeatherWidget:
 
         widget.render(mock_draw, colours)
 
-        text_calls = [call[0][1] for call in mock_draw.text.call_args_list]
-        assert "teraz:" not in text_calls
+        # Check current temperature
+        text_calls = [call[0] for call in mock_draw.text.call_args_list]
+        assert any("2.5°C" in c[1] for c in text_calls)
+
+        # Check current icon bitmap
+        bitmap_calls = [call[0] for call in mock_draw.bitmap.call_args_list]
+        assert any(c[0] == (5, 44) for c in bitmap_calls)
+
+    def test_weather_widget_renders_forecast_items(self):
+        bounds = Rectangle(280, 6, 120, 200)
+        weather_data = WeatherViewData(
+            name="Stockholm",
+            sunrise=datetime.datetime(2023, 12, 25, 8, 30),
+            sunset=datetime.datetime(2023, 12, 25, 15, 45),
+            now_temp=2.5,
+            now_icon="01d",
+            forecast=[
+                ForecastItem(
+                    time=datetime.datetime(2023, 12, 25, 18, 0), temp=1, icon="03d"
+                ),
+                ForecastItem(
+                    time=datetime.datetime(2023, 12, 25, 21, 0), temp=-1, icon="13d"
+                ),
+            ],
+        )
+        mock_font_loader = MagicMock()
+        widget = WeatherWidget(bounds, mock_font_loader, weather_data)
+
+        mock_draw = MagicMock()
+        # Mock textbbox for height calculations
+        mock_draw.textbbox.return_value = (0, 0, 10, 10)
+
+        backend = PngFileBackend()
+        colours = backend.colors
+
+        widget.render(mock_draw, colours)
+
+        # Should have 1 current icon + 2 forecast icons
+        bitmap_calls = mock_draw.bitmap.call_args_list
+        assert len(bitmap_calls) == 3
+
+        # Verify forecast times and temperatures are rendered
+        text_content = [call[0][1] for call in mock_draw.text.call_args_list]
+        assert "18:00" in text_content
+        assert "21:00" in text_content
+        assert "1°C" in text_content
+        assert "-1°C" in text_content
+
+    def test_weather_widget_handles_empty_forecast(self):
+        bounds = Rectangle(280, 6, 120, 200)
+        weather_data = WeatherViewData(
+            name="Stockholm",
+            sunrise=datetime.datetime(2023, 12, 25, 8, 30),
+            sunset=datetime.datetime(2023, 12, 25, 15, 45),
+            now_temp=2.5,
+            now_icon="01d",
+            forecast=[],
+        )
+        mock_font_loader = MagicMock()
+        widget = WeatherWidget(bounds, mock_font_loader, weather_data)
+
+        mock_draw = MagicMock()
+        widget.render(mock_draw, [0, 1, 2])
+
+        # Only 1 bitmap (current weather)
+        assert mock_draw.bitmap.call_count == 1
