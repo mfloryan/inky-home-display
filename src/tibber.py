@@ -1,26 +1,20 @@
+import functools
 import json
 import logging
-import os
 from datetime import datetime
+
 import requests
+
 from cache import cache
+
+from .tokens import read_token_file
 
 logger = logging.getLogger(__name__)
 
 
+@functools.lru_cache(maxsize=1)
 def load_token():
-    try:
-        file = open(
-            os.path.join(os.path.dirname(__file__), "tibber-api-token"),
-            "r",
-            encoding="utf-8",
-        )
-    except FileNotFoundError as ex:
-        logger.error("Token file `tibber-api-token` not found")
-        raise RuntimeError("Unable to load Tibber token") from ex
-    else:
-        with file:
-            return file.read()
+    return read_token_file("tibber-api-token", "Unable to load Tibber token")
 
 
 def load_prices_from_tibber():
