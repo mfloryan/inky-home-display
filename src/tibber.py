@@ -6,8 +6,7 @@ from datetime import datetime
 import requests
 
 from cache import cache
-
-from .tokens import read_token_file
+from tokens import read_token_file
 
 logger = logging.getLogger(__name__)
 
