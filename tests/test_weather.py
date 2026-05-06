@@ -34,11 +34,8 @@ def test_load_token_returns_file_content_when_file_exists():
 
 
 def test_load_token_raises_error_when_file_not_found():
-    with patch("builtins.open", side_effect=FileNotFoundError()):
-        with patch("weather.logging.getLogger") as mock_get_logger:
-            mock_logger = Mock()
-            mock_get_logger.return_value = mock_logger
-
+    with patch("tokens.open", side_effect=FileNotFoundError()):
+        with patch("tokens.logger") as mock_logger:
             with pytest.raises(RuntimeError, match="Unable to load Open Weather token"):
                 weather.load_token()
 
