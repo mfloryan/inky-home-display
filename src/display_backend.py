@@ -58,7 +58,7 @@ class InkyBackend(DisplayBackend):
             self.inky_display = auto()
             print(f"INKY wHat display: {self.inky_display.colour}")
         except ImportError as e:
-            raise RuntimeError("inky library not available") from e
+            raise RuntimeError(f"inky library not available: {e}") from e
         except RuntimeError as e:
             raise RuntimeError(f"No INKY display found: {e}") from e
 

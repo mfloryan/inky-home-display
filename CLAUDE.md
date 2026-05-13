@@ -116,6 +116,10 @@ All widgets render at their own (0,0) origin using `TranslatedDraw` for position
 - Do NOT add tests for error scenarios or missing data to visual regression tests
 - When display changes intentionally, regenerate baselines with `./test-visual-regression.sh gen`
 
+### Running Tests
+
+Tests that require fonts, locale data, or the `inky` library (e.g. widget tests, visual regression) must run in Docker — see `README.md` for the `docker compose run --rm test` command. Pure logic tests (e.g. API parsing, cache) run locally with `uv run pytest`.
+
 ### Code Style
 
 - Python 3.11 target

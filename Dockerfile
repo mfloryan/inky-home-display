@@ -58,4 +58,4 @@ VOLUME [ "/code/cache" ]
 VOLUME [ "/code/src" ]
 
 # command to run on container start
-CMD [ "uv", "run", "src/update_display.py" ]
+CMD [ "uv", "run", "--no-sync", "src/update_display.py" ]

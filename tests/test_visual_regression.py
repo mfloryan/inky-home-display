@@ -1,13 +1,18 @@
+import os
 from datetime import datetime
 import pytest
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from display import display
 
+# Use higher tolerance in CI (GitHub Actions) due to different font rendering
+# but keep it strict (0) locally to catch regressions.
+VISUAL_TOLERANCE = 47 if os.getenv("GITHUB_ACTIONS") else 0
+
 
 class TestVisualRegression:
     @pytest.mark.manual
-    @pytest.mark.mpl_image_compare(tolerance=47)
+    @pytest.mark.mpl_image_compare(tolerance=VISUAL_TOLERANCE)
     def test_display_generates_image_with_winter_data(self):
         # Realistic Swedish winter energy data
         test_data = {
@@ -35,12 +40,12 @@ class TestVisualRegression:
                 "name": "Stockholm",
                 "sunrise": datetime(2024, 1, 15, 8, 47),
                 "sunset": datetime(2024, 1, 15, 15, 12),
-                "now": {"temp": -8.5},
+                "now": {"temp": -8.5, "icon": "01n"},
                 "forecast": [
-                    {"time": datetime(2024, 1, 15, 12, 0), "temp": -6, "weather": "pochmurnie"},
-                    {"time": datetime(2024, 1, 15, 15, 0), "temp": -9, "weather": "śnieg"},
-                    {"time": datetime(2024, 1, 15, 18, 0), "temp": -12, "weather": "bezchmurnie"},
-                    {"time": datetime(2024, 1, 15, 21, 0), "temp": -15, "weather": "mroźnie"}
+                    {"time": datetime(2024, 1, 15, 12, 0), "temp": -6, "icon": "04d"},
+                    {"time": datetime(2024, 1, 15, 15, 0), "temp": -9, "icon": "13d"},
+                    {"time": datetime(2024, 1, 15, 18, 0), "temp": -12, "icon": "01n"},
+                    {"time": datetime(2024, 1, 15, 21, 0), "temp": -15, "icon": "01n"},
                 ]
             },
             "current_time": datetime(2024, 1, 15, 10, 30, 0),  # Monday 10:30 AM

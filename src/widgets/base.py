@@ -26,6 +26,7 @@ class DrawProtocol(Protocol):
     def textbbox(self, xy, text, **kwargs) -> tuple[float, float, float, float]: ...
     def point(self, xy, **kwargs): ...
     def ellipse(self, xy, **kwargs): ...
+    def bitmap(self, xy, bitmap, **kwargs): ...
 
 
 class TranslatedDraw:
@@ -33,6 +34,10 @@ class TranslatedDraw:
         self.draw = draw
         self.offset_x = offset_x
         self.offset_y = offset_y
+
+    def bitmap(self, xy, bitmap, **kwargs):
+        translated_xy = (xy[0] + self.offset_x, xy[1] + self.offset_y)
+        return self.draw.bitmap(translated_xy, bitmap, **kwargs)
 
     def text(self, xy, text, **kwargs):
         translated_xy = (xy[0] + self.offset_x, xy[1] + self.offset_y)

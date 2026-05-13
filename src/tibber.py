@@ -1,23 +1,19 @@
+import functools
+import json
 import logging
-import os
 from datetime import datetime
+
 import requests
+
 from cache import cache
+from tokens import read_token_file
+
+logger = logging.getLogger(__name__)
 
 
+@functools.lru_cache(maxsize=1)
 def load_token():
-    try:
-        file = open(
-            os.path.join(os.path.dirname(__file__), "tibber-api-token"),
-            "r",
-            encoding="utf-8",
-        )
-    except FileNotFoundError as ex:
-        logging.getLogger(__name__).error("Token file `tibber-api-token` not found")
-        raise RuntimeError("Unable to load Tibber token") from ex
-    else:
-        with file:
-            return file.read()
+    return read_token_file("tibber-api-token", "Unable to load Tibber token")
 
 
 def load_prices_from_tibber():
@@ -29,21 +25,27 @@ def load_prices_from_tibber():
 
     homes = response_json.get("data", {}).get("viewer", {}).get("homes", [])
     if not homes:
+        logger.debug("Tibber prices response: %s", json.dumps(response_json))
         raise RuntimeError("No homes found in Tibber API response")
 
-    current_subscription = homes[0].get("currentSubscription")
-    if current_subscription is None:
+    home = next((h for h in homes if h.get("currentSubscription") is not None), None)
+    if home is None:
+        logger.debug("Tibber prices response: %s", json.dumps(response_json))
         raise RuntimeError(
             "No active subscription found in Tibber API response. "
             "Please check your Tibber account status."
         )
 
+    current_subscription = home.get("currentSubscription")
+
     price_info = current_subscription.get("priceInfo")
     if price_info is None:
+        logger.debug("Tibber prices response: %s", json.dumps(response_json))
         raise RuntimeError("No price information available in Tibber API response")
 
     today_prices = price_info.get("today")
     if today_prices is None:
+        logger.debug("Tibber prices response: %s", json.dumps(response_json))
         raise RuntimeError("No prices available for today in Tibber API response")
 
     return list(map(lambda _: _["total"], today_prices))
@@ -61,9 +63,16 @@ def load_day_stats_from_tibber():
 
     homes = response_json.get("data", {}).get("viewer", {}).get("homes", [])
     if not homes:
+        logger.debug("Tibber stats response: %s", json.dumps(response_json))
         raise RuntimeError("No homes found in Tibber API response")
 
-    data = homes[0]
+    data = next(
+        (h for h in homes if h.get("consumption") is not None or h.get("production") is not None),
+        None,
+    )
+    if data is None:
+        logger.debug("Tibber stats response: %s", json.dumps(response_json))
+        raise RuntimeError("No energy data found in Tibber API response")
 
     now = datetime.now()
     def today(date):
@@ -103,12 +112,14 @@ def load_data_from_tibber(token, query):
     timeout=10)
 
     if response.status_code != 200:
+        logger.debug("Tibber response body: %s", response.text)
         raise RuntimeError(
-            f"Tiber responded with response code: {response.status_code}"
+            f"Tibber responded with status {response.status_code}"
         )
 
     response_json = response.json()
     if "errors" in response_json:
+        logger.debug("Tibber response: %s", json.dumps(response_json))
         raise RuntimeError(f"Tibber returned errors: {response_json['errors']}")
 
     return response_json

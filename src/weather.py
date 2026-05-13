@@ -1,25 +1,15 @@
-from datetime import datetime
+import functools
 import logging
-import os
+from datetime import datetime
 
 import requests
 
+from tokens import read_token_file
 
+
+@functools.lru_cache(maxsize=1)
 def load_token():
-    try:
-        file = open(
-            os.path.join(os.path.dirname(__file__), "openweather-api-token"),
-            "r",
-            encoding="utf-8",
-        )
-    except FileNotFoundError as ex:
-        logging.getLogger(__name__).error(
-            "Token file `openweather-api-token` not found"
-        )
-        raise RuntimeError("Unable to load Open Weather token") from ex
-    else:
-        with file:
-            return file.read()
+    return read_token_file("openweather-api-token", "Unable to load Open Weather token")
 
 
 def _fetch_from_api(url, params):
@@ -40,14 +30,13 @@ def get_weather():
         return {
             "time": datetime.fromtimestamp(item["dt"]),
             "temp": item["main"]["temp"],
-            "weather": item["weather"][0]["description"],
+            "icon": item["weather"][0]["icon"],
         }
 
     payload = {
         "lat": "59.4308",
         "lon": "18.0637",
         "units": "metric",
-        "lang": "pl",
         "appid": load_token(),
     }
 
@@ -60,6 +49,7 @@ def get_weather():
         "sunset": datetime.fromtimestamp(current_weather["sys"]["sunset"]),
         "now": {
             "temp": current_weather["main"]["temp"],
+            "icon": current_weather["weather"][0]["icon"],
         },
     }
 

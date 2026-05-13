@@ -82,9 +82,10 @@ def create_weather_widget(bounds, data, font_loader):
         sunrise=data["weather"]["sunrise"],
         sunset=data["weather"]["sunset"],
         now_temp=data["weather"]["now"]["temp"],
+        now_icon=data["weather"]["now"]["icon"],
         forecast=[
             ForecastItem(
-                time=forecast["time"], temp=forecast["temp"], weather=forecast["weather"]
+                time=forecast["time"], temp=forecast["temp"], icon=forecast["icon"]
             )
             for forecast in data["weather"]["forecast"]
         ],

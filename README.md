@@ -18,18 +18,16 @@ Inky Home Display is a Python-based home automation dashboard that renders energ
 ### Linting
 
 ```bash
-uv run ruff check . --fix
+make lint
 ```
 
 ### Testing
 
-Using `pytest` to execute test. Unit tests can be run locally (eg. on a Mac) but end-to-end test require docker environment, these tests are marked as `manual`.
+Using `pytest` to execute test. Tests require locale config, fonts and libraries available only on linux so they are always run in a docker container.
 
 ```bash
-uv run pytest
+make test
 ```
-
-**TODO**: Widget tests currently fail on Mac due to font dependencies. Need to mock font loading or run widget tests in Docker.
 
 ### Visual Regression Testing
 
@@ -48,7 +46,7 @@ Visual regression tests compare generated display images with baseline images to
 
 ## Docker Development
 
-The code requires locale data, unix fonts and `inky` library not available on a Mac. Hence some development uses **docker** to run the code fully.
+The code requires locale data, unix fonts and `inky` library not available on a Mac. Hence development uses **docker** to run the code fully.
 
 ```bash
 # Build once
@@ -67,15 +65,32 @@ docker compose run --rm test
 ### Direct Usage
 
 ```bash
-# On Raspberry Pi with Inky hardware (default behavior)
-uv run src/update_display.py
-
 # On Mac/Linux with PNG output
 uv run src/update_display.py --png-only
 ```
 
 ### Deployment
 
+Deploy to the server using the sync script:
+
 ```bash
-rsync -arv --exclude '__pycache__/' src/ jagoda.mm:inky/
+./sync.sh
+```
+
+This syncs `pyproject.toml` to `jagoda.mm:/opt/home-display/` and `src/` to `jagoda.mm:/opt/home-display/inky/`.
+
+The server runs a plain Python venv at `/opt/home-display/python-env/`. The Pi Zero W is ARMv6 and cannot compile packages from source, so dependencies are installed via pip using [piwheels](https://www.piwheels.org) which provides pre-built ARM wheels. piwheels is already configured on the Pi so no extra index URL is needed.
+
+Some piwheels wheels require system libraries not installed by default. If you see an `ImportError` about a missing `.so` file after upgrading, install the corresponding system package:
+
+```bash
+sudo apt install libopenblas0   # required by numpy >= 2.4
+```
+
+When dependencies change, install them on the server:
+
+```bash
+uv export --no-dev --no-hashes -o requirements-deploy.txt
+scp requirements-deploy.txt jagoda.mm:/opt/home-display/
+ssh jagoda.mm '/opt/home-display/python-env/bin/pip install -r /opt/home-display/requirements-deploy.txt'
 ```

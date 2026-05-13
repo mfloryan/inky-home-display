@@ -23,6 +23,12 @@ class FontLoader:
             ),
         )
 
+    def terminus_bold(self, size):
+        return self._cached_font(
+            f"terminus_bold_{size}",
+            lambda: self._make_terminus_bold(size),
+        )
+
     def terminus_bold_16(self):
         return self._cached_font(
             "terminus_bold_16",
