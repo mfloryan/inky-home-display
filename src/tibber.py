@@ -1,23 +1,7 @@
-import logging
-import os
 from datetime import datetime
 import requests
 from cache import cache
-
-
-def load_token():
-    try:
-        file = open(
-            os.path.join(os.path.dirname(__file__), "tibber-api-token"),
-            "r",
-            encoding="utf-8",
-        )
-    except FileNotFoundError as ex:
-        logging.getLogger(__name__).error("Token file `tibber-api-token` not found")
-        raise RuntimeError("Unable to load Tibber token") from ex
-    else:
-        with file:
-            return file.read()
+from config import load_token
 
 
 def load_prices_from_tibber():
@@ -25,7 +9,7 @@ def load_prices_from_tibber():
         "{ viewer { homes { currentSubscription { priceInfo(resolution:QUARTER_HOURLY){today {total startsAt}}}}}}"
     )
 
-    response_json = load_data_from_tibber(load_token(), query)
+    response_json = load_data_from_tibber(load_token("tibber-api-token", "Tibber"), query)
 
     homes = response_json.get("data", {}).get("viewer", {}).get("homes", [])
     if not homes:
@@ -57,7 +41,7 @@ def load_day_stats_from_tibber():
         "}}}"
     )
 
-    response_json = load_data_from_tibber(load_token(), query)
+    response_json = load_data_from_tibber(load_token("tibber-api-token", "Tibber"), query)
 
     homes = response_json.get("data", {}).get("viewer", {}).get("homes", [])
     if not homes:
