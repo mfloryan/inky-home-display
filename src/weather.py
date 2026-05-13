@@ -1,25 +1,14 @@
+import functools
 from datetime import datetime
-import logging
-import os
 
 import requests
 
+from tokens import read_token_file
 
+
+@functools.lru_cache(maxsize=1)
 def load_token():
-    try:
-        file = open(
-            os.path.join(os.path.dirname(__file__), "openweather-api-token"),
-            "r",
-            encoding="utf-8",
-        )
-    except FileNotFoundError as ex:
-        logging.getLogger(__name__).error(
-            "Token file `openweather-api-token` not found"
-        )
-        raise RuntimeError("Unable to load Open Weather token") from ex
-    else:
-        with file:
-            return file.read()
+    return read_token_file("openweather-api-token", "Unable to load Open Weather token")
 
 
 def get_weather():
