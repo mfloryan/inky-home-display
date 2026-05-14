@@ -37,26 +37,32 @@ def get_weather():
         "appid": load_token(),
     }
 
-    r = requests.get(
-        "https://api.openweathermap.org/data/2.5/weather", params=payload, timeout=10
-    )
-    current_weather = r.json()
-    weather = {
-        "name": current_weather["name"],
-        "sunrise": datetime.fromtimestamp(current_weather["sys"]["sunrise"]),
-        "sunset": datetime.fromtimestamp(current_weather["sys"]["sunset"]),
-        "now": {
-            "temp": current_weather["main"]["temp"],
-            "icon": current_weather["weather"][0]["icon"],
-        },
-    }
+    try:
+        r = requests.get(
+            "https://api.openweathermap.org/data/2.5/weather", params=payload, timeout=10
+        )
+        r.raise_for_status()
+        current_weather = r.json()
+        weather = {
+            "name": current_weather["name"],
+            "sunrise": datetime.fromtimestamp(current_weather["sys"]["sunrise"]),
+            "sunset": datetime.fromtimestamp(current_weather["sys"]["sunset"]),
+            "now": {
+                "temp": current_weather["main"]["temp"],
+                "icon": current_weather["weather"][0]["icon"],
+            },
+        }
 
-    forecast_payload = payload | {"cnt": 8}
-    r = requests.get(
-        "https://api.openweathermap.org/data/2.5/forecast",
-        params=forecast_payload,
-        timeout=10,
-    )
-    forecast = r.json()
-    weather["forecast"] = list(map(parse_forecast, forecast["list"]))
-    return weather
+        forecast_payload = payload | {"cnt": 8}
+        r = requests.get(
+            "https://api.openweathermap.org/data/2.5/forecast",
+            params=forecast_payload,
+            timeout=10,
+        )
+        r.raise_for_status()
+        forecast = r.json()
+        weather["forecast"] = list(map(parse_forecast, forecast["list"]))
+        return weather
+    except (requests.exceptions.RequestException, ValueError, KeyError) as e:
+        logging.getLogger(__name__).error(f"Error fetching weather: {e}")
+        return None

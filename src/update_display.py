@@ -37,10 +37,16 @@ def main():
     except Exception as e:
         logger.error("Failed to fetch Tibber energy stats: %s", e)
 
+    weather = None
+    try:
+        weather = get_weather()
+    except Exception as e:
+        logger.error("Failed to fetch weather: %s", e)
+
     data = {
         "energy_prices": energy_prices,
         "energy_stats": energy_stats,
-        "weather": get_weather(),
+        "weather": weather,
         "transport": get_morning_departures_cached(current_time),
         "current_time": current_time,
     }
