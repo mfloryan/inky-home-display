@@ -6,6 +6,7 @@ from .energy import (
     EnergyPriceLabelsWidget,
     EnergyStatsWidget,
 )
+from .house_temps import HouseTempReading, HouseTempsViewData, HouseTempsWidget
 from .layout import FooterWidget, HeaderWidget
 from .transport import DepartureViewData, TransportViewData, TransportWidget
 from .weather import ForecastItem, WeatherViewData, WeatherWidget
@@ -21,6 +22,9 @@ __all__ = [
     "FooterWidget",
     "ForecastItem",
     "HeaderWidget",
+    "HouseTempReading",
+    "HouseTempsViewData",
+    "HouseTempsWidget",
     "Rectangle",
     "TranslatedDraw",
     "TransportViewData",
