@@ -21,6 +21,7 @@ class WeatherViewData:
     now_temp: float
     now_icon: str
     forecast: list[ForecastItem]
+    heatpump_outdoor_temp: float | None = None
 
 
 class WeatherWidget(Widget):
@@ -65,8 +66,18 @@ class WeatherWidget(Widget):
             fill=colours[0],
         )
 
-        icon_h = 16
         y = 84
+        if data.heatpump_outdoor_temp is not None:
+            hp_text = f"zewn. {data.heatpump_outdoor_temp:.1f}°"
+            draw.text(
+                (temperature_right - int(draw.textlength(hp_text, font=font_sun)), 76),
+                hp_text,
+                font=font_sun,
+                fill=colours[0],
+            )
+            y = 92
+
+        icon_h = 16
         for forecast in data.forecast[:4]:
             icon_bottom = y + icon_h
 

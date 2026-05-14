@@ -127,3 +127,58 @@ class TestWeatherWidget:
 
         # Only 1 bitmap (current weather)
         assert mock_draw.bitmap.call_count == 1
+
+
+def _make_weather_data(**kwargs):
+    defaults = dict(
+        name="Stockholm",
+        sunrise=datetime.datetime(2023, 12, 25, 8, 30),
+        sunset=datetime.datetime(2023, 12, 25, 15, 45),
+        now_temp=2.5,
+        now_icon="01d",
+        forecast=[],
+    )
+    return WeatherViewData(**{**defaults, **kwargs})
+
+
+class WhenWeatherDataIncludesHeatpumpOutdoorTemp:
+    def it_renders_the_zewn_label_with_temperature(self):
+        weather_data = _make_weather_data(heatpump_outdoor_temp=11.2)
+        mock_draw = MagicMock()
+        mock_draw.textlength.return_value = 40
+
+        WeatherWidget(Rectangle(0, 0, 120, 200), MagicMock(), weather_data).render(
+            mock_draw, PngFileBackend().colors
+        )
+
+        text_content = [call[0][1] for call in mock_draw.text.call_args_list]
+        assert any("zewn." in t and "11.2°" in t for t in text_content)
+
+    def it_does_not_render_zewn_line_when_temp_is_absent(self):
+        weather_data = _make_weather_data(heatpump_outdoor_temp=None)
+        mock_draw = MagicMock()
+        mock_draw.textlength.return_value = 40
+
+        WeatherWidget(Rectangle(0, 0, 120, 200), MagicMock(), weather_data).render(
+            mock_draw, PngFileBackend().colors
+        )
+
+        text_content = [call[0][1] for call in mock_draw.text.call_args_list]
+        assert not any("zewn." in t for t in text_content)
+
+    def it_starts_forecast_items_lower_when_heatpump_temp_is_shown(self):
+        forecast = [ForecastItem(time=datetime.datetime(2023, 12, 25, 18, 0), temp=1, icon="03d")]
+        weather_data_with = _make_weather_data(heatpump_outdoor_temp=11.2, forecast=forecast)
+        weather_data_without = _make_weather_data(heatpump_outdoor_temp=None, forecast=forecast)
+
+        def forecast_y(weather_data):
+            mock_draw = MagicMock()
+            mock_draw.textlength.return_value = 10
+            mock_draw.textbbox.return_value = (0, 0, 10, 10)
+            WeatherWidget(Rectangle(0, 0, 120, 200), MagicMock(), weather_data).render(
+                mock_draw, PngFileBackend().colors
+            )
+            bitmap_calls = mock_draw.bitmap.call_args_list
+            return bitmap_calls[-1][0][0][1]
+
+        assert forecast_y(weather_data_with) > forecast_y(weather_data_without)
