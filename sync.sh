@@ -4,4 +4,5 @@ rsync -arv --delete \
  --exclude '.DS_Store' \
  --exclude 'cache/' \
  --exclude '*.egg-info/' \
+ --exclude '.env' \
  src/ jagoda.mm:/opt/home-display/inky/
