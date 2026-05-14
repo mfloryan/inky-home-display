@@ -142,17 +142,20 @@ def _make_weather_data(**kwargs):
 
 
 class WhenWeatherDataIncludesHeatpumpOutdoorTemp:
-    def it_renders_the_zewn_label_with_temperature(self):
+    def it_renders_the_zewn_label_and_temperature_as_separate_elements(self):
         weather_data = _make_weather_data(heatpump_outdoor_temp=11.2)
         mock_draw = MagicMock()
         mock_draw.textlength.return_value = 40
+        colours = PngFileBackend().colors
 
         WeatherWidget(Rectangle(0, 0, 120, 200), MagicMock(), weather_data).render(
-            mock_draw, PngFileBackend().colors
+            mock_draw, colours
         )
 
-        text_content = [call[0][1] for call in mock_draw.text.call_args_list]
-        assert any("zewn." in t and "11.2°" in t for t in text_content)
+        text_calls = {call[0][1]: call[1]["fill"] for call in mock_draw.text.call_args_list}
+        assert "zewn." in text_calls
+        assert "11.2°C" in text_calls
+        assert text_calls["11.2°C"] == colours[1]
 
     def it_does_not_render_zewn_line_when_temp_is_absent(self):
         weather_data = _make_weather_data(heatpump_outdoor_temp=None)

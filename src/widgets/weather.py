@@ -68,13 +68,13 @@ class WeatherWidget(Widget):
 
         y = 84
         if data.heatpump_outdoor_temp is not None:
-            hp_text = f"zewn. {data.heatpump_outdoor_temp:.1f}°"
-            draw.text(
-                (temperature_right - int(draw.textlength(hp_text, font=font_sun)), 76),
-                hp_text,
-                font=font_sun,
-                fill=colours[0],
-            )
+            font_hp_temp = self.font_loader.terminus_bold_16()
+            hp_temp = f"{data.heatpump_outdoor_temp:.1f}°C"
+            hp_temp_x = temperature_right - int(draw.textlength(hp_temp, font=font_hp_temp))
+            hp_label = "zewn."
+            hp_label_x = hp_temp_x - int(draw.textlength(hp_label, font=font_sun)) - 2
+            draw.text((hp_label_x, 78), hp_label, font=font_sun, fill=colours[0])
+            draw.text((hp_temp_x, 76), hp_temp, font=font_hp_temp, fill=colours[1])
             y = 92
 
         icon_h = 16

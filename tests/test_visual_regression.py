@@ -48,6 +48,7 @@ class TestVisualRegression:
                     {"time": datetime(2024, 1, 15, 21, 0), "temp": -15, "icon": "01n"},
                 ]
             },
+            "heatpump_outdoor_temp": -11.5,
             "current_time": datetime(2024, 1, 15, 10, 30, 0),  # Monday 10:30 AM
             "transport": [
                 {

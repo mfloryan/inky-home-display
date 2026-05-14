@@ -89,6 +89,7 @@ def create_weather_widget(bounds, data, font_loader):
             )
             for forecast in data["weather"]["forecast"]
         ],
+        heatpump_outdoor_temp=data.get("heatpump_outdoor_temp"),
     )
 
     return [WeatherWidget(bounds, font_loader, weather_view_data)]

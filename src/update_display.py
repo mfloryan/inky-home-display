@@ -6,6 +6,7 @@ from datetime import datetime
 
 from display import display
 from data.public_transport import get_morning_departures_cached
+from data.thermia import get_outdoor_temp
 from data.tibber import tibber_energy_prices, tibber_energy_stats
 from data.weather import get_weather
 
@@ -42,6 +43,7 @@ def main():
         "energy_stats": energy_stats,
         "weather": get_weather(),
         "transport": get_morning_departures_cached(current_time),
+        "heatpump_outdoor_temp": get_outdoor_temp(),
         "current_time": current_time,
     }
 
