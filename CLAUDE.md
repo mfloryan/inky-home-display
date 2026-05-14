@@ -12,17 +12,23 @@ Check @README.md for project overview and development commands
 - **`display.py`** - Core rendering logic for the e-paper display, handles layout and drawing
 - **`display_backend.py`** - Backend abstraction layer for different display outputs (Inky hardware vs PNG)
 - **`fonts.py`** - Font management and loading utilities for display rendering
+
+### Data Sources (`src/data/`)
+
 - **`tibber.py`** - Tibber energy API integration for electricity prices and consumption data
 - **`weather.py`** - OpenWeather API integration for weather forecasts and conditions
-- **`cache.py`** - File-based caching system to minimize API calls and improve performance
-- **`public_transport.py`** - Stockholm public transport (SL API) integration (incomplete)
+- **`public_transport.py`** - Stockholm public transport (SL API) integration
+- **`thermia.py`** - Reads outdoor temperature from Thermia heatpump via Modbus (no caching — always live)
+- **`house_sensors.py`** - Fetches indoor room temperatures from local sensor endpoint (no caching — always live)
+- **`cache.py`** - File-based caching system to minimise API calls
+- **`tokens.py`** - Loads API tokens from local files
 
 ### Data Flow
 
-1. APIs are called to fetch fresh data (Tibber, OpenWeather, SL)
-2. Responses are cached locally as JSON files with time-based expiration
-3. Data is processed and formatted for display
-4. `display.py` renders the information onto the e-ink display using Pillow
+1. Data sources in `src/data/` are called — some cached (Tibber, OpenWeather, SL), some always live (thermia, house sensors)
+2. Cached responses are stored as JSON files in `src/cache/` with time-based expiration
+3. Data is assembled into a dict and passed to `display.py`
+4. `display.py` builds ViewData objects and renders widgets onto the e-ink display using Pillow
 5. Output can be either sent to physical Inky display or saved as PNG for development
 
 ### API Configuration
@@ -47,7 +53,8 @@ The application targets a 3-color e-ink display (black, yellow, white) with spec
 - Polish language for weather descriptions and energy statistics
 - Energy price graphs with current hour highlighting
 - Real-time energy production/consumption data
-- Weather forecast with temperature and conditions
+- Weather forecast with temperature and conditions, including live outdoor temperature from the heatpump (`zewn.`)
+- Indoor room temperatures (Salon, Sypialnia, Kuchnia) from local sensors
 - Timestamp showing last update
 
 ## Widget Architecture
@@ -76,7 +83,9 @@ WeatherWidget(bounds, font_loader, weather_view_data)
 - **EnergyStatsWidget** - Uses `EnergyData` ViewData (production, consumption, profit, cost)
 - **EnergyPriceGraphWidget** - Uses `EnergyPriceData` ViewData (day_prices, current_quarter)
 - **EnergyPriceLabelsWidget** - Uses `EnergyPriceData` ViewData (shared with graph)
-- **WeatherWidget** - Uses `WeatherViewData` and `ForecastItem` ViewData classes
+- **WeatherWidget** - Uses `WeatherViewData` and `ForecastItem` ViewData classes; optionally renders heatpump outdoor temp via `heatpump_outdoor_temp`
+- **HouseTempsWidget** - Uses `HouseTempsViewData` with a list of `HouseTempReading` (label + temp)
+- **TransportWidget** - Uses `TransportViewData` with a list of `DepartureViewData`
 - **HeaderWidget** - Receives `datetime.datetime` directly (no wrapping needed)
 - **FooterWidget** - Receives `datetime.datetime` directly (no wrapping needed)
 
@@ -97,8 +106,8 @@ All widgets render at their own (0,0) origin using `TranslatedDraw` for position
 
 - All test files live in the `tests/` directory, not in `src/`
 - Test files are named `test_*.py` based on the behavior or component being tested
-- Test classes use descriptive names like `TestCacheFunction` or `TestTransportWidget`
-- Test method names describe expected behavior: `test_should_return_cached_data_when_cache_file_exists`
+- New tests use behavioural naming: `When*` / `And*` classes with `it_*` methods — e.g. `WhenFetchingHouseTemperatures` / `it_returns_none_when_request_fails`
+- Older tests use `TestFoo` classes with `test_*` methods — both styles are collected by pytest
 - Use Arrange-Act-Assert pattern with clear comments separating sections
 
 ### When NOT to Write Tests
@@ -114,15 +123,15 @@ All widgets render at their own (0,0) origin using `TranslatedDraw` for position
 - Visual regression tests (in `test_visual_regression.py`) only test the happy path with all data sources working correctly
 - These tests detect unintended visual changes in the rendered display output
 - Do NOT add tests for error scenarios or missing data to visual regression tests
-- When display changes intentionally, regenerate baselines with `./test-visual-regression.sh gen`
+- When display changes intentionally, regenerate baselines with `./test-visual-regression.sh gen` then run `make test` to confirm the new baseline passes
 
 ### Running Tests
 
-Tests that require fonts, locale data, or the `inky` library (e.g. widget tests, visual regression) must run in Docker — see `README.md` for the `docker compose run --rm test` command. Pure logic tests (e.g. API parsing, cache) run locally with `uv run pytest`.
+All tests run in Docker via `make test`. This is always the correct command regardless of test type — do not run tests locally.
 
 ### Code Style
 
-- Python 3.11 target
+- Python 3.13 target
 - Ruff linter with 88-character line length
 - Double quotes for strings
 - Tests use `pytest` with `src/` in Python path
