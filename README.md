@@ -23,10 +23,18 @@ make lint
 
 ### Testing
 
-Using `pytest` to execute test. Tests require locale config, fonts and libraries available only on linux so they are always run in a docker container.
+Tests require locale config, fonts and libraries available only on Linux so they always run in a Docker container.
 
 ```bash
 make test
+```
+
+### Validate (full CI locally)
+
+Builds the test image and runs linting + all tests — mirrors the GitHub Actions pipeline exactly.
+
+```bash
+make validate
 ```
 
 ### Visual Regression Testing
@@ -74,7 +82,7 @@ uv run src/update_display.py --png-only
 Deploy to the server using the sync script:
 
 ```bash
-./sync.sh
+make deploy
 ```
 
 This syncs `pyproject.toml` to `jagoda.mm:/opt/home-display/` and `src/` to `jagoda.mm:/opt/home-display/inky/`.

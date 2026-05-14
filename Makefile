@@ -1,4 +1,4 @@
-.PHONY: test lint deploy
+.PHONY: test lint deploy validate
 
 test:
 	docker compose run --rm test
@@ -8,3 +8,6 @@ lint:
 
 deploy:
 	./sync.sh
+
+validate:
+	./validate.sh
