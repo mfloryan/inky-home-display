@@ -49,6 +49,11 @@ class TestVisualRegression:
                 ]
             },
             "heatpump_outdoor_temp": -11.5,
+            "house_temps": [
+                {"label": "Salon", "temp": 22.1},
+                {"label": "Sypialnia", "temp": 20.4},
+                {"label": "Kuchnia", "temp": 22.7},
+            ],
             "current_time": datetime(2024, 1, 15, 10, 30, 0),  # Monday 10:30 AM
             "transport": [
                 {

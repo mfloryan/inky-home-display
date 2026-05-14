@@ -5,6 +5,7 @@ import logging
 from datetime import datetime
 
 from display import display
+from data.house_sensors import get_house_temperatures
 from data.public_transport import get_morning_departures_cached
 from data.thermia import get_outdoor_temp
 from data.tibber import tibber_energy_prices, tibber_energy_stats
@@ -44,6 +45,7 @@ def main():
         "weather": get_weather(),
         "transport": get_morning_departures_cached(current_time),
         "heatpump_outdoor_temp": get_outdoor_temp(),
+        "house_temps": get_house_temperatures(),
         "current_time": current_time,
     }
 

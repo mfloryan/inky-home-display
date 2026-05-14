@@ -14,6 +14,9 @@ from widgets import (
     FooterWidget,
     ForecastItem,
     HeaderWidget,
+    HouseTempReading,
+    HouseTempsViewData,
+    HouseTempsWidget,
     Rectangle,
     TranslatedDraw,
     TransportViewData,
@@ -30,6 +33,7 @@ LAYOUT = {
     "energy_graph": Rectangle(6, 60, 194, 194),
     "transport": Rectangle(202, 60, 76, 227),
     "weather": Rectangle(280, 6, 120, 200),
+    "house_temps": Rectangle(280, 208, 120, 79),
     "footer": Rectangle(200, 287, 200, 13),
 }
 
@@ -95,6 +99,16 @@ def create_weather_widget(bounds, data, font_loader):
     return [WeatherWidget(bounds, font_loader, weather_view_data)]
 
 
+def create_house_temps_widget(bounds, data, font_loader):
+    if not data.get("house_temps"):
+        return []
+    readings = [
+        HouseTempReading(label=r["label"], temp=r["temp"])
+        for r in data["house_temps"]
+    ]
+    return [HouseTempsWidget(bounds, font_loader, HouseTempsViewData(readings=readings))]
+
+
 def create_footer_widget(bounds, data, font_loader):
     return [FooterWidget(bounds, font_loader, data["current_time"])]
 
@@ -130,6 +144,7 @@ def generate_content(draw, data, colours):
     widgets.extend(create_energy_stats_widget(LAYOUT["energy_stats"], data, font_loader))
     widgets.extend(create_transport_widget(LAYOUT["transport"], data, font_loader))
     widgets.extend(create_weather_widget(LAYOUT["weather"], data, font_loader))
+    widgets.extend(create_house_temps_widget(LAYOUT["house_temps"], data, font_loader))
     widgets.extend(create_footer_widget(LAYOUT["footer"], data, font_loader))
 
     for widget in widgets:
