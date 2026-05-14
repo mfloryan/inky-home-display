@@ -1,5 +1,5 @@
 rsync -arv pyproject.toml jagoda.mm:/opt/home-display/pyproject.toml
-rsync -arv \
+rsync -arv --delete \
  --exclude '__pycache__/' \
  --exclude '.DS_Store' \
  --exclude 'cache/' \
