@@ -32,8 +32,8 @@ LAYOUT = {
     "energy_stats": Rectangle(200, 256, 0, 65),
     "energy_graph": Rectangle(6, 60, 194, 194),
     "transport": Rectangle(202, 60, 76, 227),
-    "weather": Rectangle(280, 6, 120, 200),
-    "house_temps": Rectangle(280, 208, 120, 79),
+    "weather": Rectangle(285, 6, 120, 200),
+    "house_temps": Rectangle(285, 208, 120, 79),
     "footer": Rectangle(200, 287, 200, 13),
 }
 

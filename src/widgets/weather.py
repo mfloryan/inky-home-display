@@ -73,8 +73,8 @@ class WeatherWidget(Widget):
             hp_temp_x = temperature_right - int(draw.textlength(hp_temp, font=font_hp_temp))
             hp_label = "zewn."
             hp_label_x = hp_temp_x - int(draw.textlength(hp_label, font=font_sun)) - 2
-            draw.text((hp_label_x, 78), hp_label, font=font_sun, fill=colours[0])
-            draw.text((hp_temp_x, 76), hp_temp, font=font_hp_temp, fill=colours[1])
+            draw.text((hp_label_x, 74), hp_label, font=font_sun, fill=colours[0])
+            draw.text((hp_temp_x, 72), hp_temp, font=font_hp_temp, fill=colours[1])
             y = 92
 
         icon_h = 16
@@ -90,7 +90,7 @@ class WeatherWidget(Widget):
                 fill=colours[0],
             )
 
-            draw.bitmap((35, y), load_icon(forecast.icon, 16), fill=colours[0])
+            draw.bitmap((40, y), load_icon(forecast.icon, 16), fill=colours[0])
 
             temp_text = f"{round(forecast.temp)}°C"
             temp_h = draw.textbbox((0, 0), temp_text, font=font_temp_small)[3]
