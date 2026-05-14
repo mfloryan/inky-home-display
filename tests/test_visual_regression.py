@@ -110,3 +110,70 @@ class TestVisualRegression:
         plt.subplots_adjust(left=0, right=1, top=1, bottom=0)  # Remove all margins
 
         return fig
+
+    @pytest.mark.manual
+    @pytest.mark.mpl_image_compare(tolerance=VISUAL_TOLERANCE)
+    def test_display_generates_image_with_summer_data(self):
+        test_data = {
+            "energy_prices": [
+                # 00:00-05:45 - Night: very low summer prices (0.05-0.15 SEK)
+                0.12, 0.11, 0.10, 0.09, 0.08, 0.08, 0.07, 0.07, 0.06, 0.06, 0.07, 0.08,
+                0.08, 0.09, 0.10, 0.11, 0.11, 0.12, 0.12, 0.13, 0.13, 0.13, 0.14, 0.14,
+                # 06:00-11:45 - Morning: rising slightly (0.15-0.30 SEK)
+                0.15, 0.17, 0.19, 0.21, 0.23, 0.25, 0.27, 0.28, 0.28, 0.27, 0.25, 0.23,
+                0.22, 0.20, 0.18, 0.17, 0.16, 0.15, 0.14, 0.13, 0.12, 0.11, 0.10, 0.09,
+                # 12:00-17:45 - Midday solar excess: dips negative (−0.05 to 0.10 SEK)
+                0.06, 0.04, 0.01, -0.01, -0.03, -0.04, -0.05, -0.05, -0.04, -0.02, 0.01, 0.03,
+                0.05, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.13, 0.14, 0.14, 0.15,
+                # 18:00-23:45 - Evening: moderate (0.20-0.45 SEK), current at 19:30 (quarter 78)
+                0.20, 0.24, 0.28, 0.32, 0.36, 0.39, 0.42, 0.44, 0.45, 0.44, 0.42, 0.40,
+                0.38, 0.35, 0.32, 0.29, 0.26, 0.23, 0.21, 0.19, 0.18, 0.17, 0.16, 0.15,
+            ],
+            "energy_stats": {
+                "production": 18.5,
+                "consumption": 8.2,
+                "profit": 3.70,
+                "cost": 1.64,
+            },
+            "weather": {
+                "name": "Stockholm",
+                "sunrise": datetime(2024, 7, 15, 3, 43),
+                "sunset": datetime(2024, 7, 15, 22, 17),
+                "now": {"temp": 24.5, "icon": "01d"},
+                "forecast": [
+                    {"time": datetime(2024, 7, 15, 21, 0), "temp": 22, "icon": "01d"},
+                    {"time": datetime(2024, 7, 16, 0, 0), "temp": 18, "icon": "01n"},
+                    {"time": datetime(2024, 7, 16, 3, 0), "temp": 16, "icon": "01n"},
+                    {"time": datetime(2024, 7, 16, 6, 0), "temp": 19, "icon": "01d"},
+                ],
+            },
+            "heatpump_outdoor_temp": 22.3,
+            "house_temps": [
+                {"label": "Salon", "temp": 24.2},
+                {"label": "Sypialnia", "temp": 22.8},
+                {"label": "Kuchnia", "temp": 25.1},
+            ],
+            "current_time": datetime(2024, 7, 15, 19, 30, 0),  # Tuesday 19:30, outside commute
+            "transport": [],
+        }
+
+        test_output_path = "out/summer_display_test.png"
+
+        display(test_data, prefer_inky=False, png_output_path=test_output_path)
+
+        img = mpimg.imread(test_output_path)
+
+        height, width, _ = img.shape
+        output_dpi = 100
+        fig_width_inches = width / output_dpi
+        fig_height_inches = height / output_dpi
+
+        fig, ax = plt.subplots(figsize=(fig_width_inches, fig_height_inches), dpi=output_dpi)
+
+        ax.imshow(img, interpolation='nearest', resample=False)
+        ax.set_axis_off()
+        ax.set_xlim(0, width)
+        ax.set_ylim(height, 0)
+        plt.subplots_adjust(left=0, right=1, top=1, bottom=0)  # Remove all margins
+
+        return fig
