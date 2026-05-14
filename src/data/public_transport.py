@@ -3,14 +3,14 @@ import logging
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 from .cache import cache
+from config import (
+    BUS_STOP_SITE_ID,
+    BUS_STOP_WALK_MINUTES,
+    TRAIN_STOP_SITE_ID,
+    TRAIN_STOP_WALK_MINUTES,
+)
 
 logger = logging.getLogger(__name__)
-
-BUS_STOP_SITE_ID = 2216
-TRAIN_STOP_SITE_ID = 9633
-
-BUS_STOP_WALK_MINUTES = 6
-TRAIN_STOP_WALK_MINUTES = 10
 
 CACHE_INTERVAL_MINUTES = 10
 

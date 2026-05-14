@@ -10,6 +10,7 @@ dependencies = [
     "fonts==0.0.3",
     "requests>=2.33.0",
     "tmodbus>=0.2.3",
+    "python-dotenv>=1.0.0",
 ]
 
 [dependency-groups]

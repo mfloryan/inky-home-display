@@ -3,9 +3,7 @@ import logging
 
 import tmodbus
 
-THERMIA_HOST = "172.16.2.178"
-THERMIA_PORT = 502
-THERMIA_UNIT_ID = 1
+from config import THERMIA_HOST, THERMIA_PORT, THERMIA_UNIT_ID
 
 logger = logging.getLogger(__name__)
 

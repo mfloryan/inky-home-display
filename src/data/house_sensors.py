@@ -2,7 +2,8 @@ import logging
 
 import requests
 
-HOUSE_API_URL = "http://malina.mm/house/cgi-bin/house.py"
+from config import HOUSE_API_URL
+
 SELECTED_SENSORS = [
     ("sensor-up", "Salon"),
     ("sensor-master-bedroom", "Sypialnia"),
