@@ -135,6 +135,16 @@ def test_load_stats_handles_missing_production_data(mock_token):
             assert stats["cost"] == 1.5
 
 
+class WhenFetchingTibberData:
+    def it_returns_none_for_prices_when_api_call_fails(self):
+        with patch("data.tibber.cache", side_effect=RuntimeError("network error")):
+            assert tibber.tibber_energy_prices() is None
+
+    def it_returns_none_for_stats_when_api_call_fails(self):
+        with patch("data.tibber.cache", side_effect=RuntimeError("network error")):
+            assert tibber.tibber_energy_stats() is None
+
+
 @patch("data.tibber.load_token", return_value="fake-token")
 def test_load_stats_handles_missing_consumption_data(mock_token):
     import datetime

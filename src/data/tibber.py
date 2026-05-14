@@ -126,13 +126,21 @@ def load_data_from_tibber(token, query):
 
 
 def tibber_energy_prices():
-    return cache(
-        f"tibber-prices-{datetime.now().strftime('%Y%m%d')}", load_prices_from_tibber
-    )
+    try:
+        return cache(
+            f"tibber-prices-{datetime.now().strftime('%Y%m%d')}", load_prices_from_tibber
+        )
+    except Exception as e:
+        logger.error("Failed to fetch Tibber energy prices: %s", e)
+        return None
 
 
 def tibber_energy_stats():
-    return cache(
-        f"tibber-stats-{datetime.now().strftime('%Y%m%d-%H')}",
-        load_day_stats_from_tibber,
-    )
+    try:
+        return cache(
+            f"tibber-stats-{datetime.now().strftime('%Y%m%d-%H')}",
+            load_day_stats_from_tibber,
+        )
+    except Exception as e:
+        logger.error("Failed to fetch Tibber energy stats: %s", e)
+        return None
