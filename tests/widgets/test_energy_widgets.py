@@ -32,13 +32,13 @@ class TestEnergyStatsWidget:
         calls = mock_draw.text.call_args_list
 
         production_call = calls[0]
-        assert production_call[0][0] == (0, 0)
+        assert production_call[0][0] == (130, 0)
         assert "do sieci 2.5 kWh +1.25 SEK" == production_call[0][1]
         assert production_call[1]["anchor"] == "ra"
         assert production_call[1]["fill"] == colours[0]
 
         consumption_call = calls[1]
-        assert consumption_call[0][0] == (0, 14)
+        assert consumption_call[0][0] == (130, 14)
         assert "z sieci 1.8 kWh -0.95 SEK" == consumption_call[0][1]
         assert consumption_call[1]["anchor"] == "ra"
         assert consumption_call[1]["fill"] == colours[0]

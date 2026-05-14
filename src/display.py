@@ -29,7 +29,7 @@ from widgets import (
 LAYOUT = {
     "header": Rectangle(4, 0, 396, 25),
     "price_labels": Rectangle(10, 28, 260, 30),
-    "energy_stats": Rectangle(200, 256, 0, 65),
+    "energy_stats": Rectangle(0, 256, 200, 65),
     "energy_graph": Rectangle(6, 60, 194, 194),
     "transport": Rectangle(202, 60, 76, 227),
     "weather": Rectangle(285, 6, 120, 200),
@@ -48,7 +48,7 @@ def create_header_widget(bounds, data, font_loader):
 
 
 def create_energy_price_widgets(graph_bounds, labels_bounds, data, font_loader):
-    if not data["energy_prices"]:
+    if not data.get("energy_prices"):
         return []
 
     price_data = EnergyPriceData(
@@ -64,7 +64,7 @@ def create_energy_price_widgets(graph_bounds, labels_bounds, data, font_loader):
 
 
 def create_energy_stats_widget(bounds, data, font_loader):
-    if not data["energy_stats"]:
+    if not data.get("energy_stats"):
         return []
 
     energy_data = EnergyData(

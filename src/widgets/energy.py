@@ -31,8 +31,8 @@ class EnergyStatsWidget(Widget):
         production_text = f"do sieci {round(self.energy_data.production, 2)} kWh {self.energy_data.profit:+.2f} SEK"
         consumption_text = f"z sieci {round(self.energy_data.consumption, 2)} kWh {(-1) * self.energy_data.cost:+.2f} SEK"
 
-        draw.text((0, 0), production_text, font=font, fill=colours[0], anchor="ra")
-        draw.text((0, 14), consumption_text, font=font, fill=colours[0], anchor="ra")
+        draw.text((self.bounds.width, 0), production_text, font=font, fill=colours[0], anchor="ra")
+        draw.text((self.bounds.width, 14), consumption_text, font=font, fill=colours[0], anchor="ra")
 
 
 class EnergyPriceLabelsWidget(Widget):
