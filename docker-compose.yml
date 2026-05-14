@@ -36,4 +36,4 @@ services:
       - ./out:/code/out
       - ./out/cache:/code/src/cache
     entrypoint: /bin/sh
-    command: -c "uv run ruff check . && uv run pytest && uv run pytest --mpl --mpl-results-path=out/test-results -m manual tests/test_visual_regression.py -v"
+    command: -c "uv run ruff check . && uv run pytest --cov=src --cov-report=term-missing && uv run pytest --mpl --mpl-results-path=out/test-results -m manual tests/test_visual_regression.py -v"
