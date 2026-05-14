@@ -16,6 +16,8 @@ services:
       context: .
       args:
         INSTALL_DEV: "true"
+    environment:
+      - DEBUG=1
     volumes:
       - ./src:/code/src
       - ./tests:/code/tests

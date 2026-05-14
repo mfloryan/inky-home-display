@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import os
 from datetime import datetime
 
 from display import display
@@ -24,6 +25,8 @@ def main():
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO)
+    if not os.getenv("DEBUG"):
+        logging.getLogger("pymodbus").setLevel(logging.WARNING)
 
     current_time = datetime.now()
 
