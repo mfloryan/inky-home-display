@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, mock_open
-from tokens import read_token_file
+from data.tokens import read_token_file
 
 
 def test_read_token_file_success():
@@ -12,7 +12,7 @@ def test_read_token_file_success():
 
 def test_read_token_file_not_found():
     with patch("builtins.open", side_effect=FileNotFoundError()):
-        with patch("tokens.logger") as mock_logger:
+        with patch("data.tokens.logger") as mock_logger:
             with pytest.raises(RuntimeError, match="Custom error message"):
                 read_token_file("non-existent", "Custom error message")
 

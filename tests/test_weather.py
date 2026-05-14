@@ -1,7 +1,7 @@
 import datetime
 from unittest.mock import Mock, patch, mock_open
 import pytest
-import weather
+import data.weather as weather
 
 
 @pytest.fixture
@@ -37,7 +37,7 @@ def test_load_token_returns_file_content_when_file_exists():
 def test_load_token_raises_error_when_file_not_found():
     weather.load_token.cache_clear()
     with patch("builtins.open", side_effect=FileNotFoundError()):
-        with patch("tokens.logger") as mock_logger:
+        with patch("data.tokens.logger") as mock_logger:
             with pytest.raises(RuntimeError, match="Unable to load Open Weather token"):
                 weather.load_token()
 
@@ -45,8 +45,8 @@ def test_load_token_raises_error_when_file_not_found():
 
 
 def test_get_weather_returns_structured_data(mock_weather_response):
-    with patch("weather.load_token", return_value="test_token"):
-        with patch("weather.requests.get", side_effect=mock_weather_response):
+    with patch("data.weather.load_token", return_value="test_token"):
+        with patch("data.weather.requests.get", side_effect=mock_weather_response):
             result = weather.get_weather()
 
     assert result["name"] == "Stockholm"
@@ -61,8 +61,8 @@ def test_get_weather_returns_structured_data(mock_weather_response):
 
 
 def test_get_weather_uses_correct_params():
-    with patch("weather.load_token", return_value="test_token"):
-        with patch("weather.requests.get") as mock_get:
+    with patch("data.weather.load_token", return_value="test_token"):
+        with patch("data.weather.requests.get") as mock_get:
             mock_get.return_value.json.return_value = {
                 "name": "S",
                 "sys": {"sunrise": 0, "sunset": 0},

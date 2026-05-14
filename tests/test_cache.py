@@ -1,5 +1,5 @@
 import json
-from cache import cache
+from data.cache import cache
 from unittest.mock import patch
 from datetime import datetime
 
@@ -14,7 +14,7 @@ class TestCacheFunction:
             return {"temperature": 30, "humidity": 70}
 
         # Act
-        with patch("cache.os.path.join", return_value=str(cache_file_path)):
+        with patch("data.cache.os.path.join", return_value=str(cache_file_path)):
             result = cache("weather_data", expensive_operation)
 
         # Assert
@@ -31,8 +31,8 @@ class TestCacheFunction:
             return fresh_data
 
         # Act
-        with patch("cache.os.path.join", return_value=str(nonexistent_cache_path)):
-            with patch("cache.os.mkdir"):
+        with patch("data.cache.os.path.join", return_value=str(nonexistent_cache_path)):
+            with patch("data.cache.os.mkdir"):
                 result = cache("missing_cache", data_fetching_operation)
 
         # Assert
@@ -48,7 +48,7 @@ class TestCacheFunction:
 
         # We patch the module's internal path construction to point to our tmp_path
         # but we let the actual os.makedirs and open() calls happen.
-        with patch("cache.os.path.join", return_value=str(expected_file)):
+        with patch("data.cache.os.path.join", return_value=str(expected_file)):
             # Act
             result = cache(cache_key, lambda: data)
 
@@ -66,8 +66,8 @@ class TestCacheFunction:
             return operation_data
 
         # Act
-        with patch("cache.os.path.join", return_value=str(cache_file_path)):
-            with patch("cache.os.mkdir"):
+        with patch("data.cache.os.path.join", return_value=str(cache_file_path)):
+            with patch("data.cache.os.mkdir"):
                 cache("api_cache", api_call)
 
         # Assert
@@ -82,8 +82,8 @@ class TestCacheFunction:
             return []
 
         # Act
-        with patch("cache.os.path.join", return_value=str(cache_file_path)):
-            with patch("cache.os.mkdir"):
+        with patch("data.cache.os.path.join", return_value=str(cache_file_path)):
+            with patch("data.cache.os.mkdir"):
                 result = cache("empty_cache", operation_returning_empty_array)
 
         # Assert
@@ -99,8 +99,8 @@ class TestCacheFunction:
             return operation_data
 
         # Act
-        with patch("cache.os.path.join", return_value=str(cache_file_path)):
-            with patch("cache.os.mkdir", side_effect=OSError("Permission denied")):
+        with patch("data.cache.os.path.join", return_value=str(cache_file_path)):
+            with patch("data.cache.os.mkdir", side_effect=OSError("Permission denied")):
                 # This should not raise an exception
                 result = cache("fail_cache", some_operation)
 
@@ -116,7 +116,7 @@ class TestCacheFunction:
             return {"status": "ok"}
 
         # Act
-        with patch("cache.os.path.join", return_value=str(cache_file_path)):
+        with patch("data.cache.os.path.join", return_value=str(cache_file_path)):
             result = cache("corrupted_cache", some_operation)
 
         # Assert
@@ -132,7 +132,7 @@ class TestCacheFunction:
         original_data = [{"stop_name": "Roslags Näsby", "time": test_date}]
 
         # Act
-        with patch("cache.os.path.join", return_value=str(cache_file_path)):
+        with patch("data.cache.os.path.join", return_value=str(cache_file_path)):
             # 1. Populate cache
             _ = cache(cache_key, lambda: original_data)
 

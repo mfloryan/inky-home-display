@@ -2,7 +2,7 @@ import requests
 import logging
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
-from cache import cache
+from .cache import cache
 
 logger = logging.getLogger(__name__)
 

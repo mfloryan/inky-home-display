@@ -20,7 +20,7 @@ def datetime_decoder(dct):
 
 
 def cache(cache_key, operation):
-    cache_file = os.path.join(os.path.dirname(__file__), "cache", cache_key + ".json")
+    cache_file = os.path.join(os.path.dirname(__file__), "..", "cache", cache_key + ".json")
     try:
         with open(cache_file, "r") as f:
             return json.load(f, object_hook=datetime_decoder)

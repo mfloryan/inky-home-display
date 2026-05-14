@@ -3,7 +3,7 @@ from datetime import datetime
 
 import requests
 
-from tokens import read_token_file
+from .tokens import read_token_file
 
 
 @functools.lru_cache(maxsize=1)

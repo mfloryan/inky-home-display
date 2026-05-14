@@ -2,7 +2,7 @@ import pytest
 from datetime import datetime
 from unittest.mock import patch, Mock
 import requests
-from public_transport import get_morning_departures, get_morning_departures_cached, _fetch_departures
+from data.public_transport import get_morning_departures, get_morning_departures_cached, _fetch_departures
 
 
 @pytest.mark.parametrize(
@@ -16,7 +16,7 @@ def test_returns_no_departures_outside_morning_hours(hour_outside_morning_commut
     assert departures == []
 
 
-@patch("public_transport.requests.get")
+@patch("data.public_transport.requests.get")
 def test_fetches_departures_during_morning_hours(mock_get):
     mock_response = Mock()
     mock_response.json.return_value = {
@@ -51,7 +51,7 @@ def test_fetches_departures_during_morning_hours(mock_get):
     assert departures == expected
 
 
-@patch("public_transport.requests.get")
+@patch("data.public_transport.requests.get")
 def test_filters_only_bus_605_to_danderyds_sjukhus(mock_get):
     mock_response = Mock()
     mock_response.json.return_value = {
@@ -100,7 +100,7 @@ def test_filters_only_bus_605_to_danderyds_sjukhus(mock_get):
     assert departures == expected
 
 
-@patch("public_transport.requests.get")
+@patch("data.public_transport.requests.get")
 def test_returns_departures_from_both_stops(mock_get):
     def mock_api_response(url, **kwargs):
         response = Mock()
@@ -161,7 +161,7 @@ def test_returns_departures_from_both_stops(mock_get):
     assert departures == expected
 
 
-@patch("public_transport.requests.get")
+@patch("data.public_transport.requests.get")
 def test_marks_departures_as_missed_when_scheduled_within_walk_time(mock_get):
     mock_response = Mock()
     mock_response.json.return_value = {
@@ -213,7 +213,7 @@ def test_marks_departures_as_missed_when_scheduled_within_walk_time(mock_get):
     assert departures == expected
 
 
-@patch("public_transport.requests.get")
+@patch("data.public_transport.requests.get")
 def test_filters_departures_beyond_30_minutes(mock_get):
     mock_response = Mock()
     mock_response.json.return_value = {
@@ -251,7 +251,7 @@ def test_filters_departures_beyond_30_minutes(mock_get):
     assert departures[1]["scheduled_time"] == datetime(2025, 11, 8, 8, 25, 0)
 
 
-@patch("public_transport.requests.get")
+@patch("data.public_transport.requests.get")
 def test_always_returns_at_least_one_departure_even_beyond_30_minutes(mock_get):
     mock_response = Mock()
     mock_response.json.return_value = {
@@ -281,8 +281,8 @@ def test_always_returns_at_least_one_departure_even_beyond_30_minutes(mock_get):
     assert departures[0]["scheduled_time"] == datetime(2025, 11, 8, 8, 45, 0)
 
 
-@patch("public_transport.cache")
-@patch("public_transport.get_morning_departures")
+@patch("data.public_transport.cache")
+@patch("data.public_transport.get_morning_departures")
 def test_caches_with_10_minute_intervals(mock_get_departures, mock_cache):
     mock_cache.return_value = []
 
@@ -294,8 +294,8 @@ def test_caches_with_10_minute_intervals(mock_get_departures, mock_cache):
     assert cache_key == "sl-departures-20251108-0810"
 
 
-@patch("public_transport.cache")
-@patch("public_transport.get_morning_departures")
+@patch("data.public_transport.cache")
+@patch("data.public_transport.get_morning_departures")
 def test_cache_key_rounds_to_10_minute_intervals(mock_get_departures, mock_cache):
     mock_cache.return_value = []
 
@@ -314,7 +314,7 @@ def test_cache_key_rounds_to_10_minute_intervals(mock_get_departures, mock_cache
         assert cache_key == expected_key
 
 
-@patch("public_transport.requests.get")
+@patch("data.public_transport.requests.get")
 def test_fetch_departures_handles_http_error(mock_get):
     mock_response = Mock()
     mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError("HTTP Error")
@@ -325,7 +325,7 @@ def test_fetch_departures_handles_http_error(mock_get):
     assert result == []
 
 
-@patch("public_transport.requests.get")
+@patch("data.public_transport.requests.get")
 def test_fetch_departures_handles_json_decode_error(mock_get):
     mock_response = Mock()
     mock_response.raise_for_status.return_value = None
