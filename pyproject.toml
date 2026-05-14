@@ -2,18 +2,20 @@
 name = "inky-home-display"
 version = "0.1.0"
 description = "Inky Home Display Dashboard"
-requires-python = ">=3.11"
+requires-python = ">=3.13,<3.14"
 dependencies = [
     "Pillow>=11.1.0",
     "pillow-scripts>=5.0.0",
     "inky>=2.4.0",
     "fonts==0.0.3",
     "requests>=2.33.0",
+    "tmodbus>=0.2.3",
 ]
 
 [dependency-groups]
 dev = [
     "pytest>=9.0.0",
+    "pytest-asyncio>=0.25.0",
     "pytest-mpl>=0.19.0",
     "numpy>=2.2.4",
     "ruff",
@@ -47,3 +49,6 @@ markers = [
     "manual: marks tests as manual (run with pytest -m manual)"
 ]
 addopts = "-m 'not manual'"
+python_classes = ["Test*", "When*", "And*"]
+python_functions = ["test_*", "it_*"]
+asyncio_mode = "auto"
