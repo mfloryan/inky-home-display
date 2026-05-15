@@ -4,6 +4,12 @@
 
 Inky Home Display is a Python-based home automation dashboard that renders energy prices, weather forecasts, and public transport information to a Pimoroni Inky wHat e-paper display (400x300 pixels). The screen is updated only once every 15–60 minutes. The application integrates with Tibber (Swedish energy provider), OpenWeather API, and Stockholm public transport (SL) to create a smart home information panel.
 
+## Example Output
+
+| Winter | Summer |
+|--------|--------|
+| <img src="tests/baseline/test_display_generates_image_with_winter_data.png" width="400"> | <img src="tests/baseline/test_display_generates_image_with_summer_data.png" width="400"> |
+
 ## Reference Documentation
 
 - [Pillow](https://pillow.readthedocs.io/en/stable/reference/ImageDraw.html#functions)
